@@ -1,21 +1,76 @@
 
 
 export class Todo {
+    #title;
+    #description;
+    #dueDate;
+    #priority;
+    #notes;
+    #complete;
+
     constructor(title, description = '', dueDate, priority = 1, notes = '') {
         if (!(dueDate instanceof Date)) { throw new Error(`dueDate ${dueDate} is not an instance of Date`); }
         if (isNaN(priority)) { throw new Error(`Priority ${priority} is not a valid number`); }
-        this.title = title;
-        this.description = description;
-        this.dueDate = dueDate;
-        this.priority = priority;
-        this.notes = notes;
+        this.#title = title;
+        this.#description = description;
+        this.#dueDate = dueDate;
+        this.#priority = priority;
+        this.#notes = notes;
+        this.#complete = false;
     }
 
-    change(attribute, newValue) {
-        if (this[attribute] === undefined) { throw new Error(`Attribute ${attribute} does not exist in object Todo`); }
-        if (attribute === 'dueDate' && !(newValue instanceof Date)) { throw new Error(`dueDate ${newValue} must be an instance of Date`); }
-        if (attribute === 'priority' && isNaN(newValue)) { throw new Error(`Priority ${newValue} is not a valid number`); }
-        this[attribute] = newValue;
+    get title() {
+        return this.#title;
+    }
+
+    set title(title) {
+        this.#title = title;
+    }
+
+    get description() {
+        return this.#description;
+    }
+
+    set description(newDescription) {
+        this.#description = newDescription;
+    }
+
+    get dueDate() {
+        return this.#dueDate;
+    }
+
+    set dueDate(dueDate) {
+        if (!(dueDate instanceof Date)) { throw new Error(`dueDate ${dueDate} must be an instance of Date`); }
+        this.#dueDate = dueDate;
+    }
+
+    get priority() {
+        return this.#priority;
+    }
+
+    set priority(newPriority) {
+        if (isNaN(newPriority)) { throw new Error(`Priority ${newPriority} is not a valid number`); }
+        this.#priority = newPriority;
+    }
+
+    get notes() {
+        return this.#notes;
+    }
+
+    set notes(notes) {
+        this.#notes = notes;
+    }
+
+    get complete() {
+        return this.#complete;
+    }
+
+    makeComplete() {
+        this.#complete = true;
+    }
+
+    makeIncomplete() {
+        this.#complete = false;
     }
 }
 
@@ -73,7 +128,7 @@ export class TodoManager {
 
     listProjectTodos(project = "Default") {
         if (this.projects[project] === undefined) { throw new Error(`Project ${project} does not exist`) }
-        return [...this.projects[project]].sort(
+        return this.projects[project].sort(
             (a, b) => {
                 return a.priority <= b.priority ? -1 : 1;
             }
