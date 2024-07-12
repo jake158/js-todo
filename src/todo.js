@@ -73,7 +73,11 @@ export class TodoManager {
 
     listProjectTodos(project = "Default") {
         if (this.projects[project] === undefined) { throw new Error(`Project ${project} does not exist`) }
-        return [...this.projects[project]];
+        return [...this.projects[project]].sort(
+            (a, b) => {
+                return a.priority <= b.priority ? -1 : 1;
+            }
+        );
     }
 
     listTodosBefore(date) {
