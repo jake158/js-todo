@@ -9,8 +9,8 @@ export class Todo {
     #complete;
 
     constructor(title, description = '', dueDate, priority = 1, notes = '') {
-        if (!(dueDate instanceof Date)) { throw new Error(`dueDate ${dueDate} is not an instance of Date`); }
-        if (isNaN(priority)) { throw new Error(`Priority ${priority} is not a valid number`); }
+        if (!(dueDate instanceof Date)) { throw new Error(`dueDate '${dueDate}' is not an instance of Date`); }
+        if (isNaN(priority)) { throw new Error(`Priority '${priority}' is not a valid number`); }
         this.#title = title;
         this.#description = description;
         this.#dueDate = dueDate;
@@ -40,7 +40,7 @@ export class Todo {
     }
 
     set dueDate(dueDate) {
-        if (!(dueDate instanceof Date)) { throw new Error(`dueDate ${dueDate} must be an instance of Date`); }
+        if (!(dueDate instanceof Date)) { throw new Error(`dueDate '${dueDate}' must be an instance of Date`); }
         this.#dueDate = dueDate;
     }
 
@@ -49,7 +49,7 @@ export class Todo {
     }
 
     set priority(newPriority) {
-        if (isNaN(newPriority)) { throw new Error(`Priority ${newPriority} is not a valid number`); }
+        if (isNaN(newPriority)) { throw new Error(`Priority '${newPriority}' is not a valid number`); }
         this.#priority = newPriority;
     }
 
@@ -82,12 +82,12 @@ export class TodoManager {
     }
 
     addProject(project) {
-        if (this.projects[project]) { throw new Error(`Project ${project} already exists`); }
+        if (this.projects[project]) { throw new Error(`Project '${project}' already exists`); }
         this.projects[project] = [];
     }
 
     removeProject(project) {
-        if (this.projects[project] === undefined) { throw new Error(`Project ${project} does not exist`); }
+        if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`); }
         delete this.projects[project];
     }
 
@@ -98,10 +98,11 @@ export class TodoManager {
 
     addTodo(todo, project = "Default") {
         if (!(todo instanceof Todo)) { throw new Error('Given todo is not an instance of Todo'); }
-        if (this.projects[project] === undefined) { throw new Error(`Project ${project} not found`); }
+        if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`); }
         const projectLen = this.projects[project].length;
 
         todo.id = projectLen !== 0 ? this.projects[project][projectLen - 1].id + 1 : 0;
+        todo.project = project;
         this.projects[project].push(todo);
         return todo.id;
     }
@@ -112,7 +113,7 @@ export class TodoManager {
             this.projects[project].splice(index, 1)
         }
         else {
-            throw new Error(`Todo with id ${id} not found in project ${project}`);
+            throw new Error(`Todo with id '${id}' not found in project '${project}'`);
         }
     }
 
@@ -127,7 +128,7 @@ export class TodoManager {
     }
 
     listProjectTodos(project = "Default") {
-        if (this.projects[project] === undefined) { throw new Error(`Project ${project} does not exist`) }
+        if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`) }
         return this.projects[project].sort(
             (a, b) => {
                 return a.priority <= b.priority ? -1 : 1;
