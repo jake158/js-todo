@@ -21,10 +21,13 @@ class TodoView {
         this.todo.addProject('Project 2');
         this.todo.addTodo(new Todo('Project 2 todo, priority 100', '', new Date(Date.now()), 100), 'Project 2');
         this.todo.addTodo(new Todo('Project 2 todo, priority 1', '', new Date(Date.now())), 'Project 2');
+
+        this.todo.addProject('Test');
         //
 
+        const defaultProject = this.todo.listProjects()[0];
         this.populateProjects();
-        this.populateProjectTodos('Default');
+        this.populateProjectTodos(defaultProject, this.projOl.children[0]);
     }
 
     populateProjects() {
@@ -33,14 +36,14 @@ class TodoView {
             const button = document.createElement('button');
 
             button.textContent = projName;
-            button.addEventListener('click', (e) => this.populateProjectTodos(e.target.textContent));
+            button.addEventListener('click', (e) => this.populateProjectTodos(e.target.textContent, li));
 
             li.appendChild(button);
             this.projOl.appendChild(li);
         }
     }
 
-    populateProjectTodos(project) {
+    populateProjectTodos(project, li) {
         this.todoOl.innerHTML = '';
         for (const todo of this.todo.listProjectTodos(project)) {
             const li = document.createElement('li');
@@ -51,8 +54,16 @@ class TodoView {
 
             li.appendChild(button);
             this.todoOl.appendChild(li);
-
         }
+        this._makeSelected(li);
+    }
+
+    _makeSelected(li) {
+        if (this.selectedProject) {
+            this.selectedProject.classList.remove('selected');
+        }
+        li.classList.add('selected');
+        this.selectedProject = li;
     }
 
     openTodoDetails(id, project) {
