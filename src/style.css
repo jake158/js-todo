@@ -30,6 +30,7 @@ button {
     border-radius: 10px;
 }
 
+
 .plus-btn:hover {
     background-color: var(--main-hover);
 }
@@ -110,7 +111,8 @@ li {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
-    padding: 20px;
+    padding: 10px;
+    padding-top: 2px;
     background-color: white;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     z-index: 1000;
@@ -123,6 +125,22 @@ li {
 .popup h2 {
     font-size: 18px;
     margin-bottom: 10px;
+}
+
+.x-btn {
+    cursor: pointer;
+    padding: 0;
+    border: 0;
+    width: 23px;
+    height: 23px;
+    background-color: var(--main);
+    border-radius: 50%;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.x-btn:hover {
+    background-color: var(--main-hover);
 }
 
 .form-group {

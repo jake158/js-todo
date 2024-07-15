@@ -9,7 +9,10 @@ export class editTodoPopup {
     initializePopup(title, callback) {
         this.callback = callback;
         this.p.innerHTML = `
-        <h2>${title}</h2>
+        <div class="subheader">
+            <h2>${title}</h2>
+            <button class="x-btn" id="close-button">x</button>
+        </div>
         <div class="form-group">
             <label for="title">Title</label>
             <input type="text" id="title" name="title">
@@ -42,6 +45,9 @@ export class editTodoPopup {
 
         this.saveButton = this.p.querySelector('#save-button');
         this.saveButton.addEventListener('click', () => this.popupClosed());
+
+        this.closeButton = this.p.querySelector('#close-button');
+        this.closeButton.addEventListener('click', () => this.hide());
     }
 
     show(todo, callback) {
@@ -78,6 +84,7 @@ export class editTodoPopup {
     }
 }
 
+
 export class newTodoPopup extends editTodoPopup {
     constructor(parent) {
         super(parent);
@@ -99,7 +106,10 @@ export class newProjectPopup {
     initializePopup(callback) {
         this.callback = callback;
         this.p.innerHTML = `
-        <h2>New Project</h2>
+        <div class="subheader">
+            <h2>New Project</h2>
+            <button class="x-btn" id="close-button">x</button>
+        </div>
         <div class="form-group">
             <label for="title">Title</label>
             <input type="text" id="title" name="title">
@@ -112,6 +122,9 @@ export class newProjectPopup {
 
         this.saveButton = this.p.querySelector('#save-button');
         this.saveButton.addEventListener('click', () => this.popupClosed());
+
+        this.closeButton = this.p.querySelector('#close-button');
+        this.closeButton.addEventListener('click', () => this.hide());
     }
 
     show(callback) {
