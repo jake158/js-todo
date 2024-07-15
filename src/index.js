@@ -1,22 +1,23 @@
 import 'modern-normalize'
 import './style.css'
 import { Todo, TodoManager } from './todo.js'
-import { format, parse } from "date-fns";
+import { todoPopup, projectPopup } from './popUps.js';
 
 
 document.addEventListener('DOMContentLoaded', () => new TodoView(
     document.getElementById('project-list'),
     document.getElementById('todo-list'),
-    document.getElementById('edit-todo-popup')
+    document.getElementById('edit-todo-popup'),
+    document.getElementById('new-project-btn'),
+    document.getElementById('new-todo-btn'),
 ));
 
 
 class TodoView {
-    constructor(projOl, todoOl, popUpDiv) {
+    constructor(projOl, todoOl, popUpDiv, newProjectBtn, newTodoBtn) {
         this.projOl = projOl;
         this.todoOl = todoOl;
         this.todo = new TodoManager();
-        this.popUp = new todoPopUp(popUpDiv, (data) => this.todoDataUpdated(data));
 
         // Debug
         this.todo.addTodo(new Todo('Do thing', '', new Date(Date.now())), 'Default');
@@ -29,139 +30,99 @@ class TodoView {
         this.todo.addProject('Test');
         //
 
-        const defaultProject = this.todo.listProjects()[0];
         this.populateProjects();
-        this.populateProjectTodos(defaultProject);
-        this.makeSelected(this.projOl.children[0]);
+        this.selectProject(this.todo.listProjects()[0]);
+
+        this.todoPopup = new todoPopup(popUpDiv);
+        this.projectPopup = new projectPopup(popUpDiv);
+
+        newProjectBtn.addEventListener('click', () => this.projectPopup.show((title) => this.#createNewProject(title)));
+        newTodoBtn.addEventListener('click', () => this.todoPopup.show({}, (data) => this.#createNewTodo(data)));
     }
 
     populateProjects() {
+        this.projOl.innerHTML = '';
         for (const projName of this.todo.listProjects()) {
             const li = document.createElement('li');
             const button = document.createElement('button');
 
+            li.dataset.name = projName;
             button.textContent = projName;
-            button.addEventListener('click', (e) => {
-                this.populateProjectTodos(e.target.textContent);
-                this.makeSelected(li);
-            });
+            button.addEventListener('click', () => this.selectProject(projName));
 
             li.appendChild(button);
             this.projOl.appendChild(li);
         }
     }
 
-    populateProjectTodos(project) {
+    selectProject(projectName) {
+        if (this.selectedLi) {
+            this.selectedLi.classList.remove('selected');
+        }
+        const li = this.projOl.querySelector(`[data-name="${projectName}"]`)
+        li.classList.add('selected');
+        this.selectedLi = li;
+
+        this.selectedProject = projectName;
+        this.#populateProjectTodos(projectName);
+    }
+
+    #populateProjectTodos(projectName) {
         this.todoOl.innerHTML = '';
-        for (const todo of this.todo.listProjectTodos(project)) {
+        for (const todo of this.todo.listProjectTodos(projectName)) {
             const li = document.createElement('li');
             const button = document.createElement('button');
 
             button.textContent = todo.title;
-            button.addEventListener('click', () => this.openTodoDetails(todo.id, project));
+            button.addEventListener('click', () => this.#openTodoDetails(todo.id, projectName));
 
             li.appendChild(button);
             this.todoOl.appendChild(li);
         }
     }
 
-    makeSelected(li) {
-        if (this.selectedProject) {
-            this.selectedProject.classList.remove('selected');
-        }
-        li.classList.add('selected');
-        this.selectedProject = li;
-    }
-
-    openTodoDetails(id, project) {
+    #openTodoDetails(id, project) {
         const todo = this.todo.getTodo(id, project);
-        this.popUp.show(todo);
+        this.todoPopup.show(todo, (data) => this.#todoDataUpdated(data));
     }
 
-    todoDataUpdated(data) {
+    #todoDataUpdated(data) {
+        if (!this.#validateTodoData(data)) return;
         const todo = data.todo;
         delete data.todo;
         for (const key of Object.keys(data)) {
             todo[key] = data[key];
         }
-        this.populateProjectTodos(todo.project);
-    }
-}
-
-
-class todoPopUp {
-    constructor(parent, callback) {
-        this.p = parent;
-        this.p.innerHTML = this.#initializePopup();
-
-        this.title = this.p.querySelector('#title');
-        this.description = this.p.querySelector('#description');
-        this.dueDate = this.p.querySelector('#due-date');
-        this.priority = this.p.querySelector('#priority');
-        this.notes = this.p.querySelector('#notes');
-
-        this.saveButton = this.p.querySelector('#save-button');
-        this.saveButton.addEventListener('click', () => this.popUpClosed(callback));
+        this.#populateProjectTodos(todo.project);
     }
 
-    #initializePopup() {
-        return `
-        <h2>Edit Todo</h2>
-        <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title">
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" name="description"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="due-date">Due Date</label>
-            <input type="date" id="due-date" name="dueDate">
-        </div>
-        <div class="form-group">
-            <label for="priority">Priority</label>
-            <input type="number" id="priority" name="priority" min="1" required>
-        </div>
-        <div class="form-group">
-            <label for="notes">Notes</label>
-            <textarea id="notes" name="notes"></textarea>
-        </div>
-        <div class="form-group">
-            <button id="save-button">Save</button>
-        </div>
-        `
-    }
-
-    show(todo) {
-        const info = {
-            title: todo.title,
-            description: todo.description,
-            dueDate: todo.dueDate,
-            priority: todo.priority,
-            notes: todo.notes,
+    #createNewProject(title) {
+        if (!title) {
+            alert(`Invalid new project title`);
+            return;
         }
-        for (const key of Object.keys(info)) {
-            this[key].value = info[key];
+        try {
+            this.todo.addProject(title);
+            this.populateProjects();
         }
-        this.dueDate.value = format(todo['dueDate'], 'yyyy-MM-dd');
-        this.todo = todo;
-        this.p.classList.add('show');
+        catch (error) {
+            alert(error.message);
+        }
     }
 
-    hide() {
-        this.p.classList.remove('show');
+    #createNewTodo(data) {
+        if (!this.#validateTodoData(data)) return;
+        const todo = new Todo(data.title, data.description, data.dueDate, data.priority, data.notes);
+        this.todo.addTodo(todo, this.selectedProject);
+        this.#populateProjectTodos(this.selectedProject);
     }
 
-    popUpClosed(callback) {
-        this.hide();
-        callback({
-            title: this.title.value,
-            description: this.description.value,
-            dueDate: parse(this.dueDate.value, 'yyyy-MM-dd', new Date()),
-            priority: this.priority.value || 1,
-            notes: this.notes.value,
-            todo: this.todo,
-        });
+    #validateTodoData(data) {
+        if (!data.title) {
+            alert('Invalid title');
+            return false;
+        }
+        data.priority = data.priority || 1;
+        return true;
     }
 }

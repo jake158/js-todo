@@ -101,7 +101,7 @@ export class TodoManager {
         if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`); }
         const projectLen = this.projects[project].length;
 
-        todo.id = projectLen !== 0 ? this.projects[project][projectLen - 1].id + 1 : 0;
+        todo.id = projectLen - 1;
         todo.project = project;
         this.projects[project].push(todo);
         return todo.id;
