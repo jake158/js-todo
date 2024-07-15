@@ -1,7 +1,7 @@
 import 'modern-normalize'
 import './style.css'
 import { Todo, TodoManager } from './todo.js'
-import { todoPopup, projectPopup } from './popUps.js';
+import { editTodoPopup, newTodoPopup, newProjectPopup } from './popUps.js';
 
 
 document.addEventListener('DOMContentLoaded', () => new TodoView(
@@ -33,11 +33,12 @@ class TodoView {
         this.populateProjects();
         this.selectProject(this.todo.listProjects()[0]);
 
-        this.todoPopup = new todoPopup(popUpDiv);
-        this.projectPopup = new projectPopup(popUpDiv);
+        this.editTodoPopup = new editTodoPopup(popUpDiv);
+        this.newTodoPopup = new newTodoPopup(popUpDiv);
+        this.newProjectPopup = new newProjectPopup(popUpDiv);
 
-        newProjectBtn.addEventListener('click', () => this.projectPopup.show((title) => this.#createNewProject(title)));
-        newTodoBtn.addEventListener('click', () => this.todoPopup.show({}, (data) => this.#createNewTodo(data)));
+        newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.#createNewProject(title)));
+        newTodoBtn.addEventListener('click', () => this.newTodoPopup.show((data) => this.#createNewTodo(data)));
     }
 
     populateProjects() {
@@ -83,7 +84,7 @@ class TodoView {
 
     #openTodoDetails(id, project) {
         const todo = this.todo.getTodo(id, project);
-        this.todoPopup.show(todo, (data) => this.#todoDataUpdated(data));
+        this.editTodoPopup.show(todo, (data) => this.#todoDataUpdated(data));
     }
 
     #todoDataUpdated(data) {
@@ -93,7 +94,7 @@ class TodoView {
         for (const key of Object.keys(data)) {
             todo[key] = data[key];
         }
-        this.#populateProjectTodos(todo.project);
+        this.selectProject(todo.project);
     }
 
     #createNewProject(title) {
@@ -120,6 +121,10 @@ class TodoView {
     #validateTodoData(data) {
         if (!data.title) {
             alert('Invalid title');
+            return false;
+        }
+        if (!(data.dueDate instanceof Date)) {
+            alert('Invalid date');
             return false;
         }
         data.priority = data.priority || 1;

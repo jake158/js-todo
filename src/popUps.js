@@ -1,15 +1,15 @@
 import { format, parse } from "date-fns";
 
 
-export class todoPopup {
+export class editTodoPopup {
     constructor(parent) {
         this.p = parent;
     }
 
-    #initializePopup(callback) {
+    initializePopup(title, callback) {
         this.callback = callback;
         this.p.innerHTML = `
-        <h2>Edit Todo</h2>
+        <h2>${title}</h2>
         <div class="form-group">
             <label for="title">Title</label>
             <input type="text" id="title" name="title">
@@ -44,14 +44,14 @@ export class todoPopup {
         this.saveButton.addEventListener('click', () => this.popupClosed());
     }
 
-    show(todo = {}, callback) {
-        this.#initializePopup(callback);
+    show(todo, callback) {
+        this.initializePopup("Edit Todo", callback);
         const info = {
-            title: todo.title || '',
-            description: todo.description || '',
-            dueDate: todo.dueDate || new Date(Date.now()),
-            priority: todo.priority || 1,
-            notes: todo.notes || '',
+            title: todo.title,
+            description: todo.description,
+            dueDate: todo.dueDate,
+            priority: todo.priority,
+            notes: todo.notes,
         }
         for (const key of Object.keys(info)) {
             this[key].value = info[key];
@@ -78,13 +78,25 @@ export class todoPopup {
     }
 }
 
+export class newTodoPopup extends editTodoPopup {
+    constructor(parent) {
+        super(parent);
+    }
 
-export class projectPopup {
+    show(callback) {
+        this.initializePopup("Add Todo", callback);
+        this.dueDate.value = format(new Date(Date.now()), 'yyyy-MM-dd');
+        this.p.classList.add('show');
+    }
+}
+
+
+export class newProjectPopup {
     constructor(parent) {
         this.p = parent;
     }
 
-    #initializePopup(callback) {
+    initializePopup(callback) {
         this.callback = callback;
         this.p.innerHTML = `
         <h2>New Project</h2>
@@ -103,7 +115,7 @@ export class projectPopup {
     }
 
     show(callback) {
-        this.#initializePopup(callback);
+        this.initializePopup(callback);
         this.p.classList.add('show');
     }
 
