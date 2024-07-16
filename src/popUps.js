@@ -141,3 +141,33 @@ export class newProjectPopup {
         this.callback(this.title.value);
     }
 }
+
+
+export class errorPopup {
+    constructor(parent) {
+        this.p = parent;
+    }
+
+    initializePopup(message) {
+        this.p.innerHTML = `
+        <div class="subheader">
+            <h2>Error</h2>
+            <button class="x-btn" id="close-button">x</button>
+        </div>
+        <div class="form-group">
+            <p>${message}</p>
+        </div>
+        `
+        this.closeButton = this.p.querySelector('#close-button');
+        this.closeButton.addEventListener('click', () => this.hide());
+    }
+
+    show(message) {
+        this.initializePopup(message);
+        this.p.classList.add('show');
+    }
+
+    hide() {
+        this.p.classList.remove('show');
+    }
+}

@@ -1,7 +1,7 @@
 import 'modern-normalize'
 import './style.css'
 import { Todo, TodoManager } from './todo.js'
-import { editTodoPopup, newTodoPopup, newProjectPopup } from './popUps.js';
+import { editTodoPopup, newTodoPopup, newProjectPopup, errorPopup } from './popUps.js';
 import deleteIcon from './img/delete.svg';
 
 
@@ -37,6 +37,7 @@ class TodoView {
         this.editTodoPopup = new editTodoPopup(popUpDiv);
         this.newTodoPopup = new newTodoPopup(popUpDiv);
         this.newProjectPopup = new newProjectPopup(popUpDiv);
+        this.errorPopup = new errorPopup(popUpDiv);
 
         newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.#createNewProject(title)));
         newTodoBtn.addEventListener('click', () => this.newTodoPopup.show((data) => this.#createNewTodo(data)));
@@ -83,7 +84,7 @@ class TodoView {
     deleteProject(projectName) {
         const projects = this.todo.listProjects();
         if (projects.length < 2) {
-            alert('There has to be at least one project');
+            this.errorPopup.show('There has to be at least one project');
             return;
         }
         this.todo.removeProject(projectName);
@@ -127,7 +128,7 @@ class TodoView {
 
     #createNewProject(title) {
         if (!title) {
-            alert(`Invalid new project title`);
+            this.errorPopup.show('Invalid new project title');
             return;
         }
         try {
@@ -135,7 +136,7 @@ class TodoView {
             this.populateProjects();
         }
         catch (error) {
-            alert(error.message);
+            this.errorPopup.show(error.message);
         }
     }
 
@@ -148,11 +149,11 @@ class TodoView {
 
     #validateTodoData(data) {
         if (!data.title) {
-            alert('Invalid title');
+            this.errorPopup.show('Invalid title');
             return false;
         }
         if (!(data.dueDate instanceof Date)) {
-            alert('Invalid date');
+            this.errorPopup.show('Invalid date');
             return false;
         }
         data.priority = data.priority || 1;

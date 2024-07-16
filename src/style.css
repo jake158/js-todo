@@ -1,6 +1,6 @@
 :root {
-    --main: rgb(0, 219, 219);
-    --main-hover: rgb(0, 235, 235);
+    --accent: rgb(0, 219, 219);
+    --accent-hover: rgb(0, 235, 235);
 }
 
 body {
@@ -23,16 +23,15 @@ button {
     cursor: pointer;
     padding: 0;
     border: 0;
-    background-color: var(--main);
+    background-color: var(--accent);
     font-size: 1.4rem;
     width: 30px;
     height: 30px;
     border-radius: 10px;
 }
 
-
 .plus-btn:hover {
-    background-color: var(--main-hover);
+    background-color: var(--accent-hover);
 }
 
 
@@ -163,14 +162,14 @@ button {
     border: 0;
     width: 23px;
     height: 23px;
-    background-color: var(--main);
+    background-color: var(--accent);
     border-radius: 50%;
     font-size: 1rem;
     font-weight: normal;
 }
 
 .x-btn:hover {
-    background-color: var(--main-hover);
+    background-color: var(--accent-hover);
 }
 
 .form-group {
@@ -192,5 +191,5 @@ button {
 .form-group button {
     width: 100%;
     padding: 10px;
-    background-color: var(--main);
+    background-color: var(--accent);
 }
