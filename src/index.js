@@ -2,6 +2,7 @@ import 'modern-normalize'
 import './style.css'
 import { Todo, TodoManager } from './todo.js'
 import { editTodoPopup, newTodoPopup, newProjectPopup } from './popUps.js';
+import deleteIcon from './img/delete.svg';
 
 
 document.addEventListener('DOMContentLoaded', () => new TodoView(
@@ -45,13 +46,24 @@ class TodoView {
         this.projOl.innerHTML = '';
         for (const projName of this.todo.listProjects()) {
             const li = document.createElement('li');
-            const button = document.createElement('button');
-
             li.dataset.name = projName;
-            button.textContent = projName;
-            button.addEventListener('click', () => this.selectProject(projName));
 
-            li.appendChild(button);
+            const selectBtn = document.createElement('button');
+            selectBtn.classList.add('project-select-button');
+            selectBtn.textContent = projName;
+            selectBtn.addEventListener('click', () => this.selectProject(projName));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('project-delete-button');
+            deleteBtn.addEventListener('click', () => this.deleteProject(projName));
+
+            const deleteSymbol = document.createElement('img');
+            deleteSymbol.classList.add('delete-icon');
+            deleteSymbol.src = deleteIcon;
+            deleteBtn.appendChild(deleteSymbol);
+
+            li.appendChild(selectBtn);
+            li.appendChild(deleteBtn);
             this.projOl.appendChild(li);
         }
     }
@@ -66,6 +78,22 @@ class TodoView {
 
         this.selectedProject = projectName;
         this.#populateProjectTodos(projectName);
+    }
+
+    deleteProject(projectName) {
+        const projects = this.todo.listProjects();
+        if (projects.length < 2) {
+            alert('There has to be at least one project');
+            return;
+        }
+        this.todo.removeProject(projectName);
+        const li = this.projOl.querySelector(`[data-name="${projectName}"]`);
+        this.projOl.removeChild(li);
+
+        if (this.selectedProject === projectName) {
+            projects.splice(projects.indexOf(projectName), 1);
+            this.selectProject(projects.pop());
+        }
     }
 
     #populateProjectTodos(projectName) {

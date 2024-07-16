@@ -36,15 +36,6 @@ button {
 }
 
 
-.project-container {
-    height: 100vh;
-    width: 300px;
-}
-
-.project-container .subheader {
-    padding-left: 100px;
-}
-
 #project-list, #todo-list {
     margin: 0;
     padding: 0;
@@ -54,37 +45,70 @@ button {
     flex-direction: column;
 }
 
-#project-list button,
-#todo-list button {
-    background: none;
-    /* debug */
-    /* background: lightgray; */
+
+.project-container {
+    height: 100vh;
+    width: 300px;
 }
 
-#project-list button {
+.project-container .subheader {
+    padding-left: 100px;
+}
+
+#project-list>button {
     flex: 1;
     height: 100%;
     display: flex;
     align-items: center;
-    padding-left: 42px;
+}
+
+#project-list button {
+    background: none;
+}
+
+#project-list li {
+    flex: 1;
+    flex-basis: 55px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.project-select-button {
+    flex: 1;
+    display: flex;
+    padding-left: 80px;
+    align-items: center;
+}
+
+.project-delete-button {
+    min-width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-icon {
+    width: 20px;
+    height: auto;
+    visibility: hidden;
+}
+
+#project-list li:hover .delete-icon {
+    visibility: visible;
+}
+
+#project-list li:hover .project-select-button,
+#project-list li:hover .project-delete-button {
+    background-color: rgb(231, 231, 231);
 }
 
 #project-list li.selected {
     background-color: lightgray;
 }
 
-#project-list li.selected:hover {
+#project-list li.selected:hover .project-select-button,
+#project-list li.selected:hover .project-delete-button {
     background-color: lightgray;
-}
-
-#project-list li:hover {
-    background-color: rgb(238, 238, 238);
-}
-
-li {
-    flex: 1;
-    flex-basis: 55px;
-    display: flex;
 }
 
 
@@ -101,6 +125,12 @@ li {
 
 #todo-list button:hover {
     background-color: lightgray;
+}
+
+#todo-list li {
+    flex: 1;
+    flex-basis: 55px;
+    display: flex;
 }
 
 
