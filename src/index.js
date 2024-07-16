@@ -1,7 +1,13 @@
 import 'modern-normalize'
 import './style.css'
 import { Todo, TodoManager } from './todo.js'
-import { editTodoPopup, newTodoPopup, newProjectPopup, errorPopup } from './popUps.js';
+import {
+    editTodoPopup,
+    newTodoPopup,
+    newProjectPopup,
+    confirmPopup,
+    errorPopup
+} from './popUps.js';
 import deleteIcon from './img/delete.svg';
 
 
@@ -37,6 +43,7 @@ class TodoView {
         this.editTodoPopup = new editTodoPopup(popUpDiv);
         this.newTodoPopup = new newTodoPopup(popUpDiv);
         this.newProjectPopup = new newProjectPopup(popUpDiv);
+        this.confirmPopup = new confirmPopup(popUpDiv);
         this.errorPopup = new errorPopup(popUpDiv);
 
         newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.#createNewProject(title)));
@@ -87,14 +94,18 @@ class TodoView {
             this.errorPopup.show('There has to be at least one project');
             return;
         }
-        this.todo.removeProject(projectName);
-        const li = this.projOl.querySelector(`[data-name="${projectName}"]`);
-        this.projOl.removeChild(li);
+        this.confirmPopup.show(`Remove project ${projectName}?`,
+            () => {
+                this.todo.removeProject(projectName);
+                const li = this.projOl.querySelector(`[data-name="${projectName}"]`);
+                this.projOl.removeChild(li);
 
-        if (this.selectedProject === projectName) {
-            projects.splice(projects.indexOf(projectName), 1);
-            this.selectProject(projects.pop());
-        }
+                if (this.selectedProject === projectName) {
+                    projects.splice(projects.indexOf(projectName), 1);
+                    this.selectProject(projects.pop());
+                }
+            }
+        );
     }
 
     #populateProjectTodos(projectName) {

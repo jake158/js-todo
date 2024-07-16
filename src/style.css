@@ -193,3 +193,17 @@ button {
     padding: 10px;
     background-color: var(--accent);
 }
+
+.confirm-reject {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+#confirm-button {
+    background-color: lightgray;
+}
+
+#reject-button {
+    background-color: lightgray;
+}

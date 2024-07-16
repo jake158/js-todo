@@ -143,6 +143,49 @@ export class newProjectPopup {
 }
 
 
+export class confirmPopup {
+    constructor(parent) {
+        this.p = parent;
+    }
+
+    initializePopup(message, callback) {
+        this.callback = callback;
+        this.p.innerHTML = `
+        <div class="subheader">
+            <h2>${message}</h2>
+            <button class="x-btn" id="close-button">x</button>
+        </div>
+        <div class="form-group confirm-reject">
+            <button id="confirm-button">Yes</button>
+            <button id="reject-button">No</button>
+        </div>
+        `
+        this.closeButton = this.p.querySelector('#close-button');
+        this.closeButton.addEventListener('click', () => this.hide());
+
+        this.confirmButton = this.p.querySelector('#confirm-button');
+        this.confirmButton.addEventListener('click', () => this.confirmed());
+
+        this.rejectButton = this.p.querySelector('#reject-button');
+        this.rejectButton.addEventListener('click', () => this.hide());
+    }
+
+    show(message, callback) {
+        this.initializePopup(message, callback);
+        this.p.classList.add('show');
+    }
+
+    hide() {
+        this.p.classList.remove('show');
+    }
+
+    confirmed() {
+        this.hide();
+        this.callback();
+    }
+}
+
+
 export class errorPopup {
     constructor(parent) {
         this.p = parent;
