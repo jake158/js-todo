@@ -65,12 +65,8 @@ export class Todo {
         return this.#complete;
     }
 
-    makeComplete() {
-        this.#complete = true;
-    }
-
-    makeIncomplete() {
-        this.#complete = false;
+    set complete(bool) {
+        this.#complete = !!bool;
     }
 }
 

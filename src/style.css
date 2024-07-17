@@ -11,6 +11,7 @@ body {
 button {
     border: none;
     cursor: pointer;
+    background: none;
 }
 
 .subheader {
@@ -111,25 +112,85 @@ button {
 }
 
 
-.todo-container {
+.todo-list-container {
     height: 100vh;
-    padding-left: 140px;
-
+    padding-left: 160px;
     flex: 1;
 }
 
-.todo-container .subheader {
+.todo-list-container .subheader {
+    padding-bottom: 30px;
     width: 300px;
 }
 
-#todo-list button:hover {
-    background-color: lightgray;
+#todo-list {
+    gap: 30px;
 }
 
 #todo-list li {
-    flex: 1;
-    flex-basis: 55px;
+    width: 100%;
+}
+
+
+.todo-container {
+    max-width: 400px;
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+}
+
+.todo-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.todo-entry.complete .todo-title {
+    text-decoration: line-through;
+}
+
+.complete-button {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.complete-icon {
+    width: 30px;
+    height: auto;
+}
+
+.todo-button {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.todo-info {
+    width: 100%;
+    padding-left: 35px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.due-info {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.calendar-icon {
+    height: 13px;
+    width: auto;
+}
+
+.todo-info p {
+    margin: 0;
+    font-size: 0.8rem;
 }
 
 

@@ -1,5 +1,6 @@
 import 'modern-normalize'
 import './style.css'
+import { format } from 'date-fns';
 import { Todo, TodoManager } from './todo.js'
 import {
     editTodoPopup,
@@ -8,7 +9,11 @@ import {
     confirmPopup,
     errorPopup
 } from './popUps.js';
+
 import deleteIcon from './img/delete.svg';
+import incompleteIcon from './img/incomplete.svg';
+import completeIcon from './img/complete.svg';
+import calendarIcon from './img/calendar.svg'
 
 
 document.addEventListener('DOMContentLoaded', () => new TodoView(
@@ -109,15 +114,45 @@ class TodoView {
     }
 
     #populateProjectTodos(projectName) {
+        const currentYear = new Date().getFullYear();
+
+        const constructEntry = (todo) => {
+            const container = document.createElement('div');
+            container.innerHTML = `
+            <div class="todo-entry${todo.complete ? ' complete' : ''}">
+                <button class="complete-button">
+                    <img class="complete-icon" src=${todo.complete ? completeIcon : incompleteIcon}>
+                </button>
+                <button class="todo-button">
+                    <p class="todo-title">${todo.title}</p>
+                </button>
+            </div>
+            <div class="todo-info">
+                <div class="due-info">
+                    <img class="calendar-icon" src=${calendarIcon}>
+                    <p class="todo-due-date">${format(todo.dueDate, todo.dueDate.getFullYear() === currentYear ? 'MMMM do' : 'MMMM do, yyyy')}</p>
+                </div>
+                <p class="todo-project">${todo.project}</p>
+            </div>
+            `;
+
+            container.querySelector('.complete-button').addEventListener('click', () => {
+                todo.complete = !todo.complete;
+                this.#populateProjectTodos(todo.project);
+            });
+
+            container.querySelector('.todo-button').addEventListener('click', () => {
+                this.#openTodoDetails(todo.id, todo.project);
+            });
+
+            container.classList.add('todo-container');
+            return container;
+        };
+
         this.todoOl.innerHTML = '';
         for (const todo of this.todo.listProjectTodos(projectName)) {
             const li = document.createElement('li');
-            const button = document.createElement('button');
-
-            button.textContent = todo.title;
-            button.addEventListener('click', () => this.#openTodoDetails(todo.id, projectName));
-
-            li.appendChild(button);
+            li.appendChild(constructEntry(todo));
             this.todoOl.appendChild(li);
         }
     }
