@@ -1,14 +1,10 @@
 import 'modern-normalize'
 import './style.css'
 import { format } from 'date-fns';
+
 import { Todo, TodoManager } from './todo.js'
-import {
-    editTodoPopup,
-    newTodoPopup,
-    newProjectPopup,
-    confirmPopup,
-    errorPopup
-} from './popUps.js';
+import { editTodoPopup, newTodoPopup } from './popUpsTodo.js'
+import { newProjectPopup, confirmPopup, errorPopup } from './popUpsOther.js';
 
 import deleteIcon from './img/delete.svg';
 import incompleteIcon from './img/incomplete.svg';
@@ -19,7 +15,7 @@ import calendarIcon from './img/calendar.svg'
 document.addEventListener('DOMContentLoaded', () => new TodoView(
     document.getElementById('project-list'),
     document.getElementById('todo-list'),
-    document.getElementById('edit-todo-popup'),
+    document.getElementById('popup'),
     document.getElementById('new-project-btn'),
     document.getElementById('new-todo-btn'),
 ));
@@ -30,28 +26,22 @@ class TodoView {
         this.projOl = projOl;
         this.todoOl = todoOl;
         this.todo = new TodoManager();
-
         // Debug
         this.todo.addTodo(new Todo('Do thing', '', new Date(Date.now())), 'Default');
         this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now())), 'Default');
-
-        this.todo.addProject('Project 2');
-        this.todo.addTodo(new Todo('Project 2 todo, priority 100', '', new Date(Date.now()), 100), 'Project 2');
-        this.todo.addTodo(new Todo('Project 2 todo, priority 1', '', new Date(Date.now())), 'Project 2');
-
-        this.todo.addProject('Test');
         //
 
         this.populateProjects();
         this.selectProject(this.todo.listProjects()[0]);
 
         this.editTodoPopup = new editTodoPopup(popUpDiv);
-        this.newTodoPopup = new newTodoPopup(popUpDiv);
-        this.newProjectPopup = new newProjectPopup(popUpDiv);
         this.confirmPopup = new confirmPopup(popUpDiv);
         this.errorPopup = new errorPopup(popUpDiv);
 
+        this.newProjectPopup = new newProjectPopup(popUpDiv);
         newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.#createNewProject(title)));
+
+        this.newTodoPopup = new newTodoPopup(popUpDiv);
         newTodoBtn.addEventListener('click', () => this.newTodoPopup.show((data) => this.#createNewTodo(data)));
     }
 

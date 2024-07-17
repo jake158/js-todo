@@ -194,7 +194,7 @@ button {
 }
 
 
-.popup {
+#popup {
     display: none;
     position: fixed;
     top: 50%;
@@ -208,11 +208,11 @@ button {
     z-index: 1000;
 }
 
-.popup.show {
+#popup.show {
     display: block;
 }
 
-.popup h2 {
+#popup h2 {
     font-size: 18px;
     margin-bottom: 10px;
 }
