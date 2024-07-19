@@ -27,7 +27,7 @@ class TodoView {
         this.todoOl = todoOl;
         this.todo = new TodoManager();
         // Debug
-        this.todo.addTodo(new Todo('Do thing', 'Description 21931823813', new Date(Date.now())), 'Default');
+        this.todo.addTodo(new Todo('Do thing', 'Description 2133333333333333333333333333333333333333333333333333333333333931823813', new Date(Date.now())), 'Default');
         this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now())), 'Default');
         //
 
@@ -117,6 +117,7 @@ class TodoView {
                     <p class="todo-title">${todo.title}</p>
                 </button>
             </div>
+            <p class="todo-description">${todo.description}</p>
             <div class="todo-info">
                 <div class="due-info">
                     <img class="calendar-icon" src=${calendarIcon}>

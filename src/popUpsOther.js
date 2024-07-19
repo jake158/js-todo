@@ -57,7 +57,7 @@ export class confirmPopup {
                 <h2>${message}</h2>
                 <button class="x-btn" id="close-button">x</button>
             </div>
-            <div class="form-group pad confirm-reject">
+            <div class="form-group horizontal pad confirm-reject">
                 <button id="confirm-button">Yes</button>
                 <button id="reject-button">No</button>
             </div>

@@ -14,10 +14,12 @@ button {
     background: none;
 }
 
-.subheader {
+.todo-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 500px;
+    margin-bottom: 20px;
 }
 
 .plus-btn {
@@ -124,16 +126,20 @@ button {
 }
 
 #todo-list {
-    gap: 30px;
+    max-width: 500px;
 }
 
 #todo-list li {
     width: 100%;
+    padding: 10px;
+    padding-left: 0;
+    padding-right: 0;
+    border-bottom: 1px solid lightgray;
 }
 
 
 .todo-container {
-    max-width: 400px;
+    max-width: 500px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -159,8 +165,11 @@ button {
 }
 
 .complete-icon {
-    width: 30px;
-    height: auto;
+    opacity: 0.7;
+}
+
+.todo-title {
+    margin: 0;
 }
 
 .todo-button {
@@ -191,6 +200,18 @@ button {
 .todo-info p {
     margin: 0;
     font-size: 0.8rem;
+}
+
+.todo-description {
+    margin: 0;
+    padding-left: 35px;
+    padding-bottom: 8px;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    text-overflow: ellipsis;
+    width: calc(100%);
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 
@@ -229,13 +250,15 @@ button {
     flex-direction: column;
 }
 
-.popup .subheader {
+.subheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 10px;
     border-bottom: 1px solid lightgray;
 }
 
-.popup .subheader h2 {
-    padding-left: calc(50% - 44px);
+.subheader h2 {
     margin: 0;
     font-size: 1rem;
     font-weight: normal;
@@ -276,6 +299,7 @@ button {
 
 .pad {
     padding: 20px;
+    padding-top: 10px;
 }
 
 input:focus,
@@ -315,8 +339,9 @@ textarea:focus-visible {
 }
 
 #title {
+    height: 50px;
     font-size: 1.35rem;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 #description {
@@ -368,9 +393,9 @@ label {
 
 #add-button {
     width: 80px;
-    height: 30px;
+    height: 35px;
     background-color: var(--accent);
-    border-radius: 8px;
+    border-radius: 16px;
     align-self: center;
 }
 
@@ -380,25 +405,23 @@ label {
 
 
 #project-title {
-    height: 35px;
-    border: 0;
-    flex: 1;
+    font-size: 1.35rem;
+    height: 50px;
     margin-bottom: 20px;
 }
 
 
 .confirm-reject {
-    display: flex;
     justify-content: center;
     gap: 30px;
 }
 
-#confirm-button {
-    background-color: lightgray;
-}
-
+#confirm-button,
 #reject-button {
-    background-color: lightgray;
+    width: 80px;
+    height: 35px;
+    border-radius: 16px;
+    background-color: rgb(189, 189, 189);
 }
 
 
