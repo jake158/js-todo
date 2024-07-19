@@ -27,7 +27,7 @@ class TodoView {
         this.todoOl = todoOl;
         this.todo = new TodoManager();
         // Debug
-        this.todo.addTodo(new Todo('Do thing', '', new Date(Date.now())), 'Default');
+        this.todo.addTodo(new Todo('Do thing', 'Description 21931823813', new Date(Date.now())), 'Default');
         this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now())), 'Default');
         //
 
@@ -42,7 +42,7 @@ class TodoView {
         newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.#createNewProject(title)));
 
         this.newTodoPopup = new newTodoPopup(popUpDiv);
-        newTodoBtn.addEventListener('click', () => this.newTodoPopup.show((data) => this.#createNewTodo(data)));
+        newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
     }
 
     populateProjects() {
@@ -149,11 +149,12 @@ class TodoView {
 
     #openTodoDetails(id, project) {
         const todo = this.todo.getTodo(id, project);
-        this.editTodoPopup.show(todo, (data) => this.#todoDataUpdated(data));
+        this.editTodoPopup.show(todo, this.todo.listProjects(), (data) => this.#todoDataUpdated(data), () => this.#deleteTodo(id, project));
     }
 
     #todoDataUpdated(data) {
         if (!this.#validateTodoData(data)) return;
+        // Todo: Add changing project of todo
         const todo = data.todo;
         delete data.todo;
         for (const key of Object.keys(data)) {
@@ -176,10 +177,15 @@ class TodoView {
         }
     }
 
-    #createNewTodo(data) {
+    #createTodo(data) {
         if (!this.#validateTodoData(data)) return;
         const todo = new Todo(data.title, data.description, data.dueDate, data.priority, data.notes);
         this.todo.addTodo(todo, this.selectedProject);
+        this.#populateProjectTodos(this.selectedProject);
+    }
+
+    #deleteTodo(id, project) {
+        this.todo.removeTodo(id, project);
         this.#populateProjectTodos(this.selectedProject);
     }
 
