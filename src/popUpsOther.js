@@ -13,19 +13,16 @@ export class newProjectPopup {
                 <h2>New Project</h2>
                 <button class="x-btn" id="close-button">x</button>
             </div>
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" id="title" name="title">
-            </div>
-            <div class="form-group">
-                <button id="save-button">Save</button>
+            <div class="form-group pad">
+                <input type="text" id="project-title" name="title" placeholder="Title" autocomplete="off">
+                <button id="add-button">Add</button>
             </div>
         </div>
         `
-        this.title = this.p.querySelector('#title');
+        this.title = this.p.querySelector('#project-title');
 
-        this.saveButton = this.p.querySelector('#save-button');
-        this.saveButton.addEventListener('click', () => this.popupClosed());
+        this.addButton = this.p.querySelector('#add-button');
+        this.addButton.addEventListener('click', () => this.popupClosed());
 
         this.closeButton = this.p.querySelector('#close-button');
         this.closeButton.addEventListener('click', () => this.hide());
@@ -60,7 +57,7 @@ export class confirmPopup {
                 <h2>${message}</h2>
                 <button class="x-btn" id="close-button">x</button>
             </div>
-            <div class="form-group confirm-reject">
+            <div class="form-group pad confirm-reject">
                 <button id="confirm-button">Yes</button>
                 <button id="reject-button">No</button>
             </div>
@@ -104,8 +101,8 @@ export class errorPopup {
                 <h2>Error</h2>
                 <button class="x-btn" id="close-button">x</button>
             </div>
-            <div class="form-group">
-                <p>${message}</p>
+            <div class="form-group pad">
+                <p class="error-msg">${message}</p>
             </div>
         </div>
         `

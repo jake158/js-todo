@@ -19,7 +19,7 @@ export class editTodoPopup {
                 <button class="x-btn" id="close-button">x</button>
             </div>
             <div class="form-group horizontal">
-                <div class="form-group edit-todo-main">
+                <div class="form-group edit-todo-main pad">
                     <div class="form-group">
                         <input type="text" id="title" name="title" placeholder="Title" autocomplete="off" required>
                         <textarea id="description" name="description" placeholder="Description" autocomplete="off"></textarea>
@@ -29,7 +29,7 @@ export class editTodoPopup {
                         <textarea id="notes" name="notes" placeholder="Note" autocomplete="off"></textarea>
                     </div>
                 </div>
-                <div class="form-group edit-todo-sidebar">
+                <div class="form-group edit-todo-sidebar pad">
                     <div class="form-group">
                         <label for="project">Project</label>
                         <select name="project" id="project">

@@ -194,21 +194,6 @@ button {
 }
 
 
-.x-btn {
-    cursor: pointer;
-    padding: 0;
-    border: 0;
-    width: 23px;
-    height: 23px;
-    background-color: var(--accent);
-    border-radius: 50%;
-    font-size: 1rem;
-    font-weight: normal;
-}
-
-.x-btn:hover {
-    background-color: var(--accent-hover);
-}
 
 #backdrop {
     display: none;
@@ -244,16 +229,35 @@ button {
     flex-direction: column;
 }
 
+.popup .subheader {
+    padding: 10px;
+    border-bottom: 1px solid lightgray;
+}
+
 .popup .subheader h2 {
+    padding-left: calc(50% - 44px);
     margin: 0;
     font-size: 1rem;
     font-weight: normal;
 }
 
-.popup .subheader {
-    padding: 10px;
-    border-bottom: 1px solid lightgray;
+
+.x-btn {
+    cursor: pointer;
+    padding: 0;
+    border: 0;
+    width: 23px;
+    height: 23px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    font-size: 1rem;
+    font-weight: normal;
 }
+
+.x-btn:hover {
+    background-color: var(--accent-hover);
+}
+
 
 .form-group {
     display: flex;
@@ -270,13 +274,18 @@ button {
     padding: 3px;
 }
 
-.form-group input:focus-visible,
-.form-group input:focus,
-.form-group textarea:focus-visible,
-.form-group textarea:focus {
-    border: 0;
-    outline: none;
+.pad {
+    padding: 20px;
 }
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+    border: 0;
+    outline: 0;
+}
+
 
 .form-group textarea {
     border: 1px solid lightgray;
@@ -295,17 +304,13 @@ button {
 }
 
 .edit-todo-main {
-    padding: 20px;
-
     flex: 4;
     justify-content: space-between;
 }
 
 .edit-todo-sidebar {
     --sidebar-color: rgb(236, 236, 236);
-    padding: 20px;
     background-color: var(--sidebar-color);
-
     flex: 1;
 }
 
@@ -366,10 +371,19 @@ label {
     height: 30px;
     background-color: var(--accent);
     border-radius: 8px;
+    align-self: center;
 }
 
 #add-button:hover {
     background-color: var(--accent-hover);
+}
+
+
+#project-title {
+    height: 35px;
+    border: 0;
+    flex: 1;
+    margin-bottom: 20px;
 }
 
 
@@ -385,4 +399,10 @@ label {
 
 #reject-button {
     background-color: lightgray;
+}
+
+
+.error-msg {
+    font-size: 1.05rem;
+    color: rgb(58, 58, 58);
 }
