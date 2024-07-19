@@ -29,6 +29,10 @@ class TodoView {
         // Debug
         this.todo.addTodo(new Todo('Do thing', 'Description 2133333333333333333333333333333333333333333333333333333333333931823813', new Date(Date.now())), 'Default');
         this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now())), 'Default');
+
+        this.todo.addProject('Test');
+        this.todo.addProject('Test2');
+        this.todo.addProject('Cool project');
         //
 
         this.populateProjects();
@@ -172,6 +176,7 @@ class TodoView {
         try {
             this.todo.addProject(title);
             this.populateProjects();
+            this.selectProject(this.selectedProject);
         }
         catch (error) {
             this.errorPopup.show(error.message);
