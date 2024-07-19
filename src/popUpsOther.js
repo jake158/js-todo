@@ -8,16 +8,18 @@ export class newProjectPopup {
     initializePopup(callback) {
         this.callback = callback;
         this.p.innerHTML = `
-        <div class="subheader">
-            <h2>New Project</h2>
-            <button class="x-btn" id="close-button">x</button>
-        </div>
-        <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title">
-        </div>
-        <div class="form-group">
-            <button id="save-button">Save</button>
+        <div class="popup">
+            <div class="subheader">
+                <h2>New Project</h2>
+                <button class="x-btn" id="close-button">x</button>
+            </div>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title">
+            </div>
+            <div class="form-group">
+                <button id="save-button">Save</button>
+            </div>
         </div>
         `
         this.title = this.p.querySelector('#title');
@@ -53,13 +55,15 @@ export class confirmPopup {
     initializePopup(message, callback) {
         this.callback = callback;
         this.p.innerHTML = `
-        <div class="subheader">
-            <h2>${message}</h2>
-            <button class="x-btn" id="close-button">x</button>
-        </div>
-        <div class="form-group confirm-reject">
-            <button id="confirm-button">Yes</button>
-            <button id="reject-button">No</button>
+        <div class="popup">
+            <div class="subheader">
+                <h2>${message}</h2>
+                <button class="x-btn" id="close-button">x</button>
+            </div>
+            <div class="form-group confirm-reject">
+                <button id="confirm-button">Yes</button>
+                <button id="reject-button">No</button>
+            </div>
         </div>
         `
         this.closeButton = this.p.querySelector('#close-button');
@@ -95,12 +99,14 @@ export class errorPopup {
 
     initializePopup(message) {
         this.p.innerHTML = `
-        <div class="subheader">
-            <h2>Error</h2>
-            <button class="x-btn" id="close-button">x</button>
-        </div>
-        <div class="form-group">
-            <p>${message}</p>
+        <div class="popup">
+            <div class="subheader">
+                <h2>Error</h2>
+                <button class="x-btn" id="close-button">x</button>
+            </div>
+            <div class="form-group">
+                <p>${message}</p>
+            </div>
         </div>
         `
         this.closeButton = this.p.querySelector('#close-button');

@@ -15,7 +15,7 @@ import calendarIcon from './img/calendar.svg'
 document.addEventListener('DOMContentLoaded', () => new TodoView(
     document.getElementById('project-list'),
     document.getElementById('todo-list'),
-    document.getElementById('popup'),
+    document.getElementById('backdrop'),
     document.getElementById('new-project-btn'),
     document.getElementById('new-todo-btn'),
 ));

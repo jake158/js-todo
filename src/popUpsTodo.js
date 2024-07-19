@@ -13,40 +13,40 @@ export class editTodoPopup {
         ).join('');
 
         this.p.innerHTML = `
-        <div class="subheader">
-            <h2>${title}</h2>
-            <button class="x-btn" id="close-button">x</button>
-        </div>
-        <div class="form-group horizontal">
-            <div class="form-group edit-todo-main">
-                <div class="form-group">
-                    <input type="text" id="title" name="title" placeholder="Title" autocomplete="off" required>
-                    <textarea id="description" name="description" placeholder="Description" autocomplete="off"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="notes">Notes</label>
-                    <textarea id="notes" name="notes" placeholder="Note" autocomplete="off"></textarea>
-                </div>
+        <div class="popup edit-todo">
+            <div class="subheader">
+                <h2>${title}</h2>
+                <button class="x-btn" id="close-button">x</button>
             </div>
-            <div class="form-group edit-todo-sidebar">
-                <div class="form-group">
-                    <label for="project">Project</label>
-                    <select name="project" id="project">
-                        ${projectOptions}
-                    </select>
-                    <label for="due-date">Due Date</label>
-                    <input type="date" id="due-date" name="dueDate">
-                    <label for="priority">Priority</label>
-                    <input type="number" id="priority" name="priority" value="1">
+            <div class="form-group horizontal">
+                <div class="form-group edit-todo-main">
+                    <div class="form-group">
+                        <input type="text" id="title" name="title" placeholder="Title" autocomplete="off" required>
+                        <textarea id="description" name="description" placeholder="Description" autocomplete="off"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" placeholder="Note" autocomplete="off"></textarea>
+                    </div>
                 </div>
-                <div class="form-group todo-button-area">
-                    <button id="delete-button"><img src=${deleteIcon}></button>
+                <div class="form-group edit-todo-sidebar">
+                    <div class="form-group">
+                        <label for="project">Project</label>
+                        <select name="project" id="project">
+                            ${projectOptions}
+                        </select>
+                        <label for="due-date">Due Date</label>
+                        <input type="date" id="due-date" name="dueDate">
+                        <label for="priority">Priority</label>
+                        <input type="number" id="priority" name="priority" value="1">
+                    </div>
+                    <div class="form-group todo-button-area">
+                        <button id="delete-button"><img src=${deleteIcon}></button>
+                    </div>
                 </div>
             </div>
         </div>
         `
-        this.p.className = 'edit-todo';
-
         this.title = this.p.querySelector('#title');
         this.description = this.p.querySelector('#description');
         this.dueDate = this.p.querySelector('#due-date');
