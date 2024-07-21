@@ -43,7 +43,7 @@ class TodoView {
         this.errorPopup = new errorPopup(popUpDiv);
 
         this.newProjectPopup = new newProjectPopup(popUpDiv);
-        newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.#createNewProject(title)));
+        newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.createProject(title)));
 
         this.newTodoPopup = new newTodoPopup(popUpDiv);
         newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
@@ -75,32 +75,47 @@ class TodoView {
         }
     }
 
-    selectProject(projectName) {
+    selectProject(title) {
         if (this.selectedLi) {
             this.selectedLi.classList.remove('selected');
         }
-        const li = this.projOl.querySelector(`[data-name="${projectName}"]`)
+        const li = this.projOl.querySelector(`[data-name="${title}"]`)
         li.classList.add('selected');
         this.selectedLi = li;
 
-        this.selectedProject = projectName;
-        this.#populateProjectTodos(projectName);
+        this.selectedProject = title;
+        this.#populateProjectTodos(title);
     }
 
-    deleteProject(projectName) {
+    createProject(title) {
+        if (!title) {
+            this.errorPopup.show('Invalid new project title');
+            return;
+        }
+        try {
+            this.todo.addProject(title);
+            this.populateProjects();
+            this.selectProject(this.selectedProject);
+        }
+        catch (error) {
+            this.errorPopup.show(error.message);
+        }
+    }
+
+    deleteProject(title) {
         const projects = this.todo.listProjects();
         if (projects.length < 2) {
             this.errorPopup.show('There has to be at least one project');
             return;
         }
-        this.confirmPopup.show(`Remove project ${projectName}?`,
+        this.confirmPopup.show(`Remove project ${title}?`,
             () => {
-                this.todo.removeProject(projectName);
-                const li = this.projOl.querySelector(`[data-name="${projectName}"]`);
+                this.todo.removeProject(title);
+                const li = this.projOl.querySelector(`[data-name="${title}"]`);
                 this.projOl.removeChild(li);
 
-                if (this.selectedProject === projectName) {
-                    projects.splice(projects.indexOf(projectName), 1);
+                if (this.selectedProject === title) {
+                    projects.splice(projects.indexOf(title), 1);
                     this.selectProject(projects.pop());
                 }
             }
@@ -158,53 +173,28 @@ class TodoView {
     }
 
     #todoDataUpdated(data) {
-        if (!this.#validateTodoData(data)) return;
-        // Todo: Add changing project of todo
         const todo = data.todo;
+        const newProject = data.project;
+        if (newProject !== todo.project) {
+            this.todo.changeTodoProject(todo.id, todo.project, newProject);
+        }
+
         delete data.todo;
+        delete data.project;
         for (const key of Object.keys(data)) {
             todo[key] = data[key];
         }
-        this.selectProject(todo.project);
-    }
-
-    #createNewProject(title) {
-        if (!title) {
-            this.errorPopup.show('Invalid new project title');
-            return;
-        }
-        try {
-            this.todo.addProject(title);
-            this.populateProjects();
-            this.selectProject(this.selectedProject);
-        }
-        catch (error) {
-            this.errorPopup.show(error.message);
-        }
+        this.#populateProjectTodos(this.selectedProject);
     }
 
     #createTodo(data) {
-        if (!this.#validateTodoData(data)) return;
         const todo = new Todo(data.title, data.description, data.dueDate, data.priority, data.notes);
-        this.todo.addTodo(todo, this.selectedProject);
+        this.todo.addTodo(todo, data.project);
         this.#populateProjectTodos(this.selectedProject);
     }
 
     #deleteTodo(id, project) {
         this.todo.removeTodo(id, project);
         this.#populateProjectTodos(this.selectedProject);
-    }
-
-    #validateTodoData(data) {
-        if (!data.title) {
-            this.errorPopup.show('Invalid title');
-            return false;
-        }
-        if (!(data.dueDate instanceof Date)) {
-            this.errorPopup.show('Invalid date');
-            return false;
-        }
-        data.priority = data.priority || 1;
-        return true;
     }
 }

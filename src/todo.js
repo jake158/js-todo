@@ -123,6 +123,13 @@ export class TodoManager {
         }
     }
 
+    changeTodoProject(id, oldProject, newProject) {
+        const todo = this.getTodo(id, oldProject);
+        if (!todo) { throw new Error(`Todo with id '${id}' not found in project '${oldProject}'`); }
+        this.removeTodo(id, oldProject);
+        this.addTodo(todo, newProject);
+    }
+
     listProjectTodos(project = "Default") {
         if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`) }
         return this.projects[project].sort(

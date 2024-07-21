@@ -85,10 +85,10 @@ export class editTodoPopup {
     popupClosed(callback) {
         this.hide();
         callback({
-            title: this.title.value,
+            title: this.title.value || 'Unnamed todo',
             description: this.description.value,
-            dueDate: parse(this.dueDate.value, 'yyyy-MM-dd', new Date()),
-            priority: this.priority.value,
+            dueDate: parse(this.dueDate.value, 'yyyy-MM-dd', new Date()) || new Date(Date.now()),
+            priority: this.priority.value || 1,
             notes: this.notes.value,
             project: this.project.value,
             todo: this.todo,
