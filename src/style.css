@@ -83,6 +83,9 @@ button {
     flex: 1;
     display: flex;
     align-items: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .project-delete-button {
@@ -104,22 +107,31 @@ button {
 
 
 .todo-list-container {
-    height: 100vh;
-    padding-left: 160px;
+    max-width: 77vw;
+    min-width: 600px;
+    margin-top: 20px;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.todo-list-container .subheader {
-    padding-bottom: 30px;
-    width: 300px;
+.todo-list-container > div {
+    width: 600px;
 }
+
+#selected-project-title {
+    margin: 0;
+}
+
 
 #todo-list {
-    max-width: 500px;
+    display: flex;
+    flex-direction: column;
 }
 
 #todo-list li {
-    width: 100%;
+    flex: 1;
     padding: 10px;
     padding-left: 0;
     padding-right: 0;
@@ -128,7 +140,7 @@ button {
 
 
 .todo-container {
-    max-width: 500px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;

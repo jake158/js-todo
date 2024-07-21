@@ -12,20 +12,21 @@ import completeIcon from './img/complete.svg';
 import calendarIcon from './img/calendar.svg'
 
 
-document.addEventListener('DOMContentLoaded', () => new TodoView(
-    document.getElementById('project-list'),
-    document.getElementById('todo-list'),
-    document.getElementById('backdrop'),
-    document.getElementById('new-project-btn'),
-    document.getElementById('new-todo-btn'),
-));
+document.addEventListener('DOMContentLoaded', () => new TodoView());
 
 
 class TodoView {
-    constructor(projOl, todoOl, popUpDiv, newProjectBtn, newTodoBtn) {
-        this.projOl = projOl;
-        this.todoOl = todoOl;
+    constructor() {
+        this.projOl = document.getElementById('project-list');
+        this.todoOl = document.getElementById('todo-list');
+        this.selectedProjHeader = document.getElementById('selected-project-title');
+
+        const popUpDiv = document.getElementById('backdrop');
+        const newProjectBtn = document.getElementById('new-project-btn');
+        const newTodoBtn = document.getElementById('new-todo-btn');
+
         this.todo = new TodoManager();
+
         // Debug
         this.todo.addTodo(new Todo('Do thing', 'Description 2133333333333333333333333333333333333333333333333333333333333931823813', new Date(Date.now())), 'Default');
         this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now())), 'Default');
@@ -84,6 +85,7 @@ class TodoView {
         this.selectedLi = li;
 
         this.selectedProject = title;
+        this.selectedProjHeader.textContent = title;
         this.#populateProjectTodos(title);
     }
 
