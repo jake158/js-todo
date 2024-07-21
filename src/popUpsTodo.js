@@ -113,7 +113,13 @@ export class newTodoPopup extends editTodoPopup {
         this.addButton = buttonArea.querySelector('button');
         this.addButton.addEventListener('click', () => this.popupClosed(callback));
 
-        this.closeButton = this.p.querySelector('#close-button');
+        // Remove all event listeners
+        const oldCloseButton = this.p.querySelector('#close-button');
+        this.closeButton = oldCloseButton.cloneNode(true);
+
+        const parent = oldCloseButton.parentNode;
+        parent.removeChild(oldCloseButton);
+        parent.appendChild(this.closeButton);
         this.closeButton.addEventListener('click', () => this.hide());
 
         this.p.classList.add('show');
