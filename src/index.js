@@ -29,7 +29,9 @@ class TodoView {
 
         // Debug
         this.todo.addTodo(new Todo('Do thing', 'Description 2133333333333333333333333333333333333333333333333333333333333931823813', new Date(Date.now())), 'Default');
+        this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now()), 3), 'Default');
         this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now())), 'Default');
+        this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now()), 300), 'Default');
 
         this.todo.addProject('Test');
         this.todo.addProject('Test2');
@@ -124,7 +126,7 @@ class TodoView {
         );
     }
 
-    #populateProjectTodos(projectName) {
+    #populateProjectTodos(title) {
         const currentYear = new Date().getFullYear();
 
         const constructEntry = (todo) => {
@@ -162,7 +164,15 @@ class TodoView {
         };
 
         this.todoOl.innerHTML = '';
-        for (const todo of this.todo.listProjectTodos(projectName)) {
+        let prevPriority = null;
+        for (const todo of this.todo.listProjectTodos(title)) {
+            if (todo.priority != prevPriority) {
+                const priorityLi = document.createElement('li');
+                priorityLi.textContent = `Priority: ${todo.priority}`;
+                priorityLi.classList.add('list-subheader');
+                prevPriority = todo.priority;
+                this.todoOl.appendChild(priorityLi);
+            }
             const li = document.createElement('li');
             li.appendChild(constructEntry(todo));
             this.todoOl.appendChild(li);
