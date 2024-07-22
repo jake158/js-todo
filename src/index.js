@@ -27,28 +27,27 @@ class TodoView {
         this.todoOl = document.getElementById('todo-list');
         this.selectedHeader = document.getElementById('selected-title');
 
-        const popUpDiv = document.getElementById('backdrop');
-        const newProjectBtn = document.getElementById('new-project-btn');
-        const newTodoBtn = document.getElementById('new-todo-btn');
-
-        this.todo = new TodoManager();
-
-        // Showcase
-        this.todo.addTodo(new Todo('Pay Taxes', '', subDays(new Date(), 365), 2), 'Default');
-        this.todo.addTodo(new Todo('Renew Driver\'s License', '', subDays(new Date(), 21), 2), 'Default');
-        this.todo.addTodo(new Todo('Book Flight Tickets', 'Oh god', new Date()), 'Default');
-
-        this.todo.addProject('Coding');
-
-        this.todo.addTodo(new Todo('Finish The Odin Project - JavaScript', '', addDays(new Date(), 7), 1), 'Coding');
-        this.todo.addTodo(new Todo('Finish The Odin Project', '', addDays(new Date(), 90), 1), 'Coding');
-        this.todo.addTodo(new Todo('Learn C#', '', addDays(new Date(), 180), 2), 'Coding');
-        this.todo.addTodo(new Todo('Get a job', '', addDays(new Date(), 240), 2), 'Coding');
-        //
+        const state = localStorage.getItem('todoState');
+        this.todo = new TodoManager(state);
+        if (!state) { this.populateState(); }
 
         this.populateCategories();
         this.populateProjects();
-        this.selectCategory('Today');
+
+        const memoryCategory = JSON.parse(localStorage.getItem('selectedCategory'));
+        const memoryProject = JSON.parse(localStorage.getItem('selectedProject'));
+
+        if (memoryCategory) {
+            this.selectCategory(memoryCategory);
+        } else if (memoryProject) {
+            this.selectProject(memoryProject);
+        } else {
+            this.selectCategory('Today');
+        }
+
+        const popUpDiv = document.getElementById('backdrop');
+        const newProjectBtn = document.getElementById('new-project-btn');
+        const newTodoBtn = document.getElementById('new-todo-btn');
 
         this.editTodoPopup = new editTodoPopup(popUpDiv);
         this.confirmPopup = new confirmPopup(popUpDiv);
@@ -59,6 +58,26 @@ class TodoView {
 
         this.newTodoPopup = new newTodoPopup(popUpDiv);
         newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
+    }
+
+    populateState() {
+        this.todo.addTodo(new Todo('Pay Taxes', '', subDays(new Date(), 365), 2), 'Default');
+        this.todo.addTodo(new Todo('Renew Driver\'s License', '', subDays(new Date(), 21), 2), 'Default');
+        this.todo.addTodo(new Todo('Book Flight Tickets', 'Oh god', new Date()), 'Default');
+
+        this.todo.addProject('Coding');
+
+        this.todo.addTodo(new Todo('Finish The Odin Project - JavaScript', '', addDays(new Date(), 7), 1), 'Coding');
+        this.todo.addTodo(new Todo('Finish The Odin Project', '', addDays(new Date(), 90), 1), 'Coding');
+        this.todo.addTodo(new Todo('Learn C#', '', addDays(new Date(), 180), 2), 'Coding');
+        this.todo.addTodo(new Todo('Get a job', '', addDays(new Date(), 240), 2), 'Coding');
+        this.saveState();
+    }
+
+    saveState() {
+        localStorage.setItem('todoState', this.todo.dumpState());
+        localStorage.setItem('selectedProject', JSON.stringify(this.selectedProject || null));
+        localStorage.setItem('selectedCategory', JSON.stringify(this.selectedCategory || null));
     }
 
     #constructEntry(todo, currentDate, renderOverdue = true, renderProject = true) {
@@ -92,6 +111,7 @@ class TodoView {
 
         container.querySelector('.complete-button').addEventListener('click', () => {
             todo.complete = !todo.complete;
+            this.saveState();
             this.refreshTodos();
         });
 
@@ -142,6 +162,7 @@ class TodoView {
         this.selectedCategory = title;
         this.selectedHeader.textContent = title;
 
+        this.saveState();
         this.#populateCategory(title);
     }
 
@@ -198,6 +219,7 @@ class TodoView {
         this.selectedProject = title;
         this.selectedHeader.textContent = title;
 
+        this.saveState();
         this.#populateProject(title);
     }
 
@@ -221,6 +243,7 @@ class TodoView {
         }
         try {
             this.todo.addProject(title);
+            this.saveState();
             this.populateProjects();
             if (this.selectedProject) {
                 this.selectProject(this.selectedProject);
@@ -240,6 +263,7 @@ class TodoView {
         this.confirmPopup.show(`Remove project ${title}?`,
             () => {
                 this.todo.removeProject(title);
+                this.saveState();
                 const li = this.projOl.querySelector(`[data-name="${title}"]`);
                 this.projOl.removeChild(li);
 
@@ -291,17 +315,20 @@ class TodoView {
         for (const key of Object.keys(data)) {
             todo[key] = data[key];
         }
+        this.saveState();
         this.refreshTodos();
     }
 
     #createTodo(data) {
         const todo = new Todo(data.title, data.description, data.dueDate, data.priority, data.notes);
         this.todo.addTodo(todo, data.project);
+        this.saveState();
         this.refreshTodos();
     }
 
     #deleteTodo(id, project) {
         this.todo.removeTodo(id, project);
+        this.saveState();
         this.refreshTodos();
     }
 }

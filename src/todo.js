@@ -68,13 +68,61 @@ export class Todo {
     set complete(bool) {
         this.#complete = !!bool;
     }
+
+    toJSON() {
+        return {
+            title: this.#title,
+            description: this.#description,
+            dueDate: this.#dueDate.toISOString(),
+            priority: this.#priority,
+            notes: this.#notes,
+            complete: this.#complete,
+            id: this.id,
+            project: this.project,
+        };
+    }
+
+    static fromJSON(json) {
+        const data = JSON.parse(json);
+        data.dueDate = new Date(data.dueDate);
+        const todo = new Todo(
+            data.title,
+            data.description,
+            data.dueDate,
+            data.priority,
+            data.notes
+        );
+        todo.complete = data.complete;
+        todo.id = data.id;
+        todo.project = data.project;
+        return todo;
+    }
 }
 
 
 export class TodoManager {
-    constructor() {
-        this.projects = {};
-        this.projects["Default"] = [];
+    constructor(initialState = null) {
+        this.projects = initialState ? this.#parseInitialState(initialState) : {};
+        if (!initialState) {
+            this.projects["Default"] = [];
+        }
+    }
+
+    #parseInitialState(initialState) {
+        const parsedState = JSON.parse(initialState);
+        const projects = {};
+        for (const [project, todos] of Object.entries(parsedState)) {
+            projects[project] = todos.map(todoJson => Todo.fromJSON(JSON.stringify(todoJson)));
+        }
+        return projects;
+    }
+
+    dumpState() {
+        const projects = {};
+        for (const [project, todos] of Object.entries(this.projects)) {
+            projects[project] = todos.map(todo => todo.toJSON());
+        }
+        return JSON.stringify(projects);
     }
 
     addProject(project) {
@@ -85,10 +133,6 @@ export class TodoManager {
     removeProject(project) {
         if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`); }
         delete this.projects[project];
-    }
-
-    listProjects() {
-        return Object.keys(this.projects);
     }
 
 
@@ -130,12 +174,17 @@ export class TodoManager {
         this.addTodo(todo, newProject);
     }
 
+
     #priorityAndDateSort(a, b) {
         if (a.priority !== b.priority) {
             return a.priority - b.priority;
         } else {
             return a.dueDate - b.dueDate;
         }
+    }
+
+    listProjects() {
+        return Object.keys(this.projects);
     }
 
     listProjectTodos(project = "Default") {
@@ -149,7 +198,7 @@ export class TodoManager {
         for (const project of Object.keys(this.projects)) {
             todos = [...todos, ...this.projects[project].filter(e => e.dueDate < date)]
         }
-        return todos.length === 0 ? null : todos.sort(this.#priorityAndDateSort);
+        return todos.sort(this.#priorityAndDateSort);
     }
 
     listAllTodos() {
@@ -157,6 +206,6 @@ export class TodoManager {
         for (const project of Object.keys(this.projects)) {
             todos = [...todos, ...this.projects[project]]
         }
-        return todos.length === 0 ? null : todos.sort(this.#priorityAndDateSort);
+        return todos.sort(this.#priorityAndDateSort);
     }
 }
