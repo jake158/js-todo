@@ -1,51 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 
-.ubuntu-light {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 300;
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('./fonts/ubuntu-m-webfont.woff2') format('woff2'),
+         url('./fonts/ubuntu-m-webfont.woff') format('woff');
+    font-weight: medium;
     font-style: normal;
 }
 
-.ubuntu-regular {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 400;
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('./fonts/ubuntu-l-webfont.woff2') format('woff2'),
+         url('./fonts/ubuntu-l-webfont.woff') format('woff');
+    font-weight: 200;
     font-style: normal;
 }
 
-.ubuntu-medium {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 500;
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('./fonts/ubuntu-b-webfont.woff2') format('woff2'),
+         url('./fonts/ubuntu-b-webfont.woff') format('woff');
+    font-weight: bold;
     font-style: normal;
 }
 
-.ubuntu-bold {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 700;
+@font-face {
+    font-family: 'Ubuntu';
+    src: url('./fonts/ubuntu-r-webfont.woff2') format('woff2'),
+         url('./fonts/ubuntu-r-webfont.woff') format('woff');
+    font-weight: normal;
     font-style: normal;
-}
-
-.ubuntu-light-italic {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 300;
-    font-style: italic;
-}
-
-.ubuntu-regular-italic {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 400;
-    font-style: italic;
-}
-
-.ubuntu-medium-italic {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 500;
-    font-style: italic;
-}
-
-.ubuntu-bold-italic {
-    font-family: "Ubuntu", sans-serif;
-    font-weight: 700;
-    font-style: italic;
 }
 
 
@@ -57,7 +40,7 @@
 body {
     min-height: 100vh;
     display: flex;
-    font-family: "Ubuntu", sans-serif;
+    font-family: 'Ubuntu', sans-serif;
     background-color: #F9FAFB;
 }
 
