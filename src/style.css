@@ -58,6 +58,7 @@ body {
     min-height: 100vh;
     display: flex;
     font-family: "Ubuntu", sans-serif;
+    background-color: #F9FAFB;
 }
 
 button {
