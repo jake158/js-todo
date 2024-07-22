@@ -1,6 +1,6 @@
 import 'modern-normalize'
 import './style.css'
-import { addDays, format } from 'date-fns';
+import { addDays, startOfDay, format } from 'date-fns';
 
 import { Todo, TodoManager } from './todo.js'
 import { editTodoPopup, newTodoPopup } from './popUpsTodo.js'
@@ -54,7 +54,15 @@ class TodoView {
         newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
     }
 
-    #constructEntry(todo, longDate = false) {
+    #constructEntry(todo, currentDate, renderOverdue = true) {
+        const renderYear = todo.dueDate.getFullYear() !== currentDate.getFullYear();
+        const overdue = startOfDay(currentDate) > startOfDay(todo.dueDate);
+
+        const getDueString = (dueDate) => {
+            const date = format(dueDate, renderYear ? 'MMMM do, yyyy' : 'MMMM do');
+            return date + (overdue && renderOverdue ? ' - Overdue' : '');
+        }
+
         const container = document.createElement('div');
         container.innerHTML = `
             <div class="todo-entry${todo.complete ? ' complete' : ''}">
@@ -69,7 +77,7 @@ class TodoView {
             <div class="todo-info">
                 <div class="due-info">
                     <img class="calendar-icon" src=${calendarIcon}>
-                    <p class="todo-due-date">${format(todo.dueDate, longDate ? 'MMMM do, yyyy' : 'MMMM do')}</p>
+                    <p class="todo-due-date${overdue && renderOverdue ? ' overdue' : ''}">${getDueString(todo.dueDate)}</p>
                 </div>
                 <p class="todo-project">${todo.project}</p>
             </div>
@@ -132,7 +140,7 @@ class TodoView {
                 this.#populateTodos(this.todo.listTodosBefore(nextWeek).filter(todo => !todo.complete));
                 break;
             case 'Done':
-                this.#populateTodos(this.todo.listAllTodos().filter(todo => todo.complete));
+                this.#populateTodos(this.todo.listAllTodos().filter(todo => todo.complete), false, false);
                 break;
         }
     }
@@ -222,7 +230,7 @@ class TodoView {
         );
     }
 
-    #populateTodos(todoArray) {
+    #populateTodos(todoArray, renderPriority = true, renderOverdue = true) {
         const constructPriorityLi = (priority) => {
             const li = document.createElement('li');
             li.textContent = `Priority: ${priority}`;
@@ -230,17 +238,17 @@ class TodoView {
             return li;
         }
 
-        const currentYear = new Date().getFullYear();
+        const currentDate = new Date();
         let prevPriority = null;
         this.todoOl.innerHTML = '';
 
         for (const todo of todoArray) {
-            if (todo.priority != prevPriority) {
+            if (renderPriority && (todo.priority != prevPriority)) {
                 prevPriority = todo.priority;
                 this.todoOl.appendChild(constructPriorityLi(todo.priority));
             }
             const li = document.createElement('li');
-            li.appendChild(this.#constructEntry(todo, todo.dueDate.getFullYear() !== currentYear));
+            li.appendChild(this.#constructEntry(todo, currentDate, renderOverdue));
             this.todoOl.appendChild(li);
         }
     }

@@ -130,13 +130,17 @@ export class TodoManager {
         this.addTodo(todo, newProject);
     }
 
+    #priorityAndDateSort(a, b) {
+        if (a.priority !== b.priority) {
+            return a.priority - b.priority;
+        } else {
+            return a.dueDate - b.dueDate;
+        }
+    }
+
     listProjectTodos(project = "Default") {
         if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`) }
-        return this.projects[project].sort(
-            (a, b) => {
-                return a.priority <= b.priority ? -1 : 1;
-            }
-        );
+        return this.projects[project].sort(this.#priorityAndDateSort);
     }
 
     listTodosBefore(date) {
@@ -145,7 +149,7 @@ export class TodoManager {
         for (const project of Object.keys(this.projects)) {
             todos = [...todos, ...this.projects[project].filter(e => e.dueDate < date)]
         }
-        return todos.length === 0 ? null : todos;
+        return todos.length === 0 ? null : todos.sort(this.#priorityAndDateSort);
     }
 
     listAllTodos() {
@@ -153,6 +157,6 @@ export class TodoManager {
         for (const project of Object.keys(this.projects)) {
             todos = [...todos, ...this.projects[project]]
         }
-        return todos.length === 0 ? null : todos;
+        return todos.length === 0 ? null : todos.sort(this.#priorityAndDateSort);
     }
 }
