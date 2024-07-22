@@ -136,12 +136,21 @@ export class TodoManager {
     }
 
 
+    #findUniqueId(inProject) {
+        const existingIds = new Set(this.projects[inProject].map(t => t.id));
+        let newId = 1;
+        while (existingIds.has(newId)) {
+            newId++;
+        }
+        return newId;
+    }
+
     addTodo(todo, project = "Default") {
         if (!(todo instanceof Todo)) { throw new Error('Given todo is not an instance of Todo'); }
         if (this.projects[project] === undefined) { throw new Error(`Project '${project}' does not exist`); }
         const projectLen = this.projects[project].length;
 
-        todo.id = projectLen === 0 ? 0 : this.projects[project][projectLen - 1].id + 1;
+        todo.id = this.#findUniqueId(project);
         todo.project = project;
         this.projects[project].push(todo);
         return todo.id;
