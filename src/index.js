@@ -1,12 +1,17 @@
 import 'modern-normalize'
 import './style.css'
-import { addDays, startOfDay, format } from 'date-fns';
+import { addDays, subDays, startOfDay, format } from 'date-fns';
 
 import { Todo, TodoManager } from './todo.js'
 import { editTodoPopup, newTodoPopup } from './popUpsTodo.js'
 import { newProjectPopup, confirmPopup, errorPopup } from './popUpsOther.js';
 
-import deleteIcon from './img/delete.svg';
+import todayIcon from './img/calendar-blank.svg';
+import weekIcon from './img/calendar-blank-multiple.svg';
+import doneIcon from './img/trash-can.svg';
+import projectIcon from './img/project.svg';
+import projectDeleteIcon from './img/delete.svg';
+
 import incompleteIcon from './img/incomplete.svg';
 import completeIcon from './img/complete.svg';
 import calendarIcon from './img/calendar.svg'
@@ -20,7 +25,7 @@ class TodoView {
         this.catgOl = document.getElementById('category-list');
         this.projOl = document.getElementById('project-list');
         this.todoOl = document.getElementById('todo-list');
-        this.selectedProjHeader = document.getElementById('selected-project-title');
+        this.selectedHeader = document.getElementById('selected-title');
 
         const popUpDiv = document.getElementById('backdrop');
         const newProjectBtn = document.getElementById('new-project-btn');
@@ -28,20 +33,22 @@ class TodoView {
 
         this.todo = new TodoManager();
 
-        // Debug
-        this.todo.addTodo(new Todo('Do thing', 'Cool description', new Date()), 'Default');
-        this.todo.addTodo(new Todo('Do another thing', '', new Date(), 3), 'Default');
-        this.todo.addTodo(new Todo('Thing in 3 days', '', addDays(new Date(), 3)), 'Default');
-        this.todo.addTodo(new Todo('Thing in 8 days', '', addDays(new Date(), 8), 300), 'Default');
+        // Showcase
+        this.todo.addTodo(new Todo('Pay Taxes', '', subDays(new Date(), 365), 2), 'Default');
+        this.todo.addTodo(new Todo('Renew Driver\'s License', '', subDays(new Date(), 21), 2), 'Default');
+        this.todo.addTodo(new Todo('Book Flight Tickets', 'Oh god', new Date()), 'Default');
 
-        this.todo.addProject('Test');
-        this.todo.addProject('Test2');
-        this.todo.addProject('Cool project');
+        this.todo.addProject('Coding');
+
+        this.todo.addTodo(new Todo('Finish The Odin Project - JavaScript', '', addDays(new Date(), 7), 1), 'Coding');
+        this.todo.addTodo(new Todo('Finish The Odin Project', '', addDays(new Date(), 90), 1), 'Coding');
+        this.todo.addTodo(new Todo('Learn C#', '', addDays(new Date(), 180), 2), 'Coding');
+        this.todo.addTodo(new Todo('Get a job', '', addDays(new Date(), 240), 2), 'Coding');
         //
 
         this.populateCategories();
         this.populateProjects();
-        this.selectProject(this.todo.listProjects()[0]);
+        this.selectCategory('Today');
 
         this.editTodoPopup = new editTodoPopup(popUpDiv);
         this.confirmPopup = new confirmPopup(popUpDiv);
@@ -54,7 +61,7 @@ class TodoView {
         newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
     }
 
-    #constructEntry(todo, currentDate, renderOverdue = true) {
+    #constructEntry(todo, currentDate, renderOverdue = true, renderProject = true) {
         const renderYear = todo.dueDate.getFullYear() !== currentDate.getFullYear();
         const overdue = startOfDay(currentDate) > startOfDay(todo.dueDate);
 
@@ -79,7 +86,7 @@ class TodoView {
                     <img class="calendar-icon" src=${calendarIcon}>
                     <p class="todo-due-date${overdue && renderOverdue ? ' overdue' : ''}">${getDueString(todo.dueDate)}</p>
                 </div>
-                <p class="todo-project">${todo.project}</p>
+                <p class="todo-project">${renderProject ? todo.project : ''}</p>
             </div>
             `;
 
@@ -99,18 +106,27 @@ class TodoView {
     populateCategories() {
         this.catgOl.innerHTML = `
             <li class="sidebar-item" data-name="Today">
-                <button class="select-button">Today</button>
+                <button class="select-button" data-target="Today">
+                    <img class="icon" src="${todayIcon}" />
+                    <p>Today</p>
+                </button>
             </li>
             <li class="sidebar-item" data-name="Week">
-                <button class="select-button">Week</button>
+                <button class="select-button" data-target="Week">
+                    <img class="icon" src="${weekIcon}" />
+                    <p>Week</p>
+                </button>
             </li>
             <li class="sidebar-item" data-name="Done">
-                <button class="select-button">Done</button>
+                <button class="select-button" data-target="Done">
+                    <img class="icon" src="${doneIcon}" />
+                    <p>Done</p>
+                </button>
             </li>
         `;
 
         this.catgOl.querySelectorAll('.select-button').forEach(button => {
-            button.addEventListener('click', (event) => this.selectCategory(event.target.textContent));
+            button.addEventListener('click', () => this.selectCategory(button.dataset.target));
         });
     }
 
@@ -124,7 +140,7 @@ class TodoView {
 
         this.selectedProject = null;
         this.selectedCategory = title;
-        this.selectedProjHeader.textContent = title;
+        this.selectedHeader.textContent = title;
 
         this.#populateCategory(title);
     }
@@ -150,20 +166,23 @@ class TodoView {
         for (const title of this.todo.listProjects()) {
             this.projOl.innerHTML += `
             <li class="sidebar-item" data-name="${title}">
-                <button class="select-button">${title}</button>
+                <button class="select-button" data-target="${title}">
+                    <img class="icon" src="${projectIcon}" />
+                    <p>${title}</p>
+                </button>
                 <button class="delete-button">
-                    <img class="delete-icon" src="${deleteIcon}" />
+                    <img class="icon delete-icon" src="${projectDeleteIcon}" />
                 </button>
             </li>
         `;
         }
 
         this.projOl.querySelectorAll('.select-button').forEach(button => {
-            button.addEventListener('click', (event) => this.selectProject(event.target.textContent));
+            button.addEventListener('click', () => this.selectProject(button.dataset.target));
         });
 
         this.projOl.querySelectorAll('.delete-button').forEach(button => {
-            button.addEventListener('click', (event) => this.deleteProject(button.closest('li').dataset.name));
+            button.addEventListener('click', () => this.deleteProject(button.closest('li').dataset.name));
         });
     }
 
@@ -177,13 +196,13 @@ class TodoView {
 
         this.selectedCategory = null;
         this.selectedProject = title;
-        this.selectedProjHeader.textContent = title;
+        this.selectedHeader.textContent = title;
 
         this.#populateProject(title);
     }
 
     #populateProject(title) {
-        this.#populateTodos(this.todo.listProjectTodos(title).filter(todo => !todo.complete));
+        this.#populateTodos(this.todo.listProjectTodos(title).filter(todo => !todo.complete), true, true, false);
     }
 
     refreshTodos() {
@@ -203,7 +222,9 @@ class TodoView {
         try {
             this.todo.addProject(title);
             this.populateProjects();
-            this.selectProject(this.selectedProject);
+            if (this.selectedProject) {
+                this.selectProject(this.selectedProject);
+            }
         }
         catch (error) {
             this.errorPopup.show(error.message);
@@ -230,7 +251,7 @@ class TodoView {
         );
     }
 
-    #populateTodos(todoArray, renderPriority = true, renderOverdue = true) {
+    #populateTodos(todoArray, renderPriority = true, renderOverdue = true, renderProject = true) {
         const constructPriorityLi = (priority) => {
             const li = document.createElement('li');
             li.textContent = `Priority: ${priority}`;
@@ -248,7 +269,7 @@ class TodoView {
                 this.todoOl.appendChild(constructPriorityLi(todo.priority));
             }
             const li = document.createElement('li');
-            li.appendChild(this.#constructEntry(todo, currentDate, renderOverdue));
+            li.appendChild(this.#constructEntry(todo, currentDate, renderOverdue, renderProject));
             this.todoOl.appendChild(li);
         }
     }

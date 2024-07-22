@@ -12,30 +12,42 @@ button {
     border: none;
     cursor: pointer;
     background: none;
+    outline: none;
 }
 
 .header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-left: 3px;
+    padding-right: 5px;
 }
 
-.plus-btn {
-    cursor: pointer;
-    padding: 0;
-    border: 0;
-    font-size: 2rem;
-    font-weight: 200;
+.header h2 {
+    font-size: 1.1rem;
+}
+
+.todo-header {
+    margin-bottom: 30px;
+}
+
+
+.add-button {
     background-color: var(--accent);
-    width: 37px;
-    border-radius: 50%;
-    opacity: 0.7;
+    border-radius: 8px;
+    padding: 4px 12px;
+    text-wrap: nowrap;
+    font-size: 0.9rem;
 }
 
-.plus-btn:hover {
+.add-button:hover {
     background-color: var(--accent-hover);
-    transition: 0.1s linear;
+    transition: 0.05s linear;
+}
+
+.add-button:active {
+    background-color: var(--accent);
 }
 
 
@@ -50,14 +62,14 @@ button {
 
 
 .sidebar {
-    margin-top: 10px;
-    margin-left: 20px;
-    height: 100vh;
+    margin-top: 20px;
+    margin-left: 15px;
     width: 200px;
 }
 
 .sidebar-item {
     border-radius: 10px;
+    height: 25px;
     flex: 1;
     flex-basis: 38px;
     display: flex;
@@ -66,28 +78,43 @@ button {
 }
 
 .sidebar-item.selected {
-    background-color: lightgray;
+    background-color: rgb(230, 230, 230);
 }
 
 .sidebar-item.selected:hover {
     background-color: rgb(219, 219, 219);
 }
 
+.sidebar-item.selected:active {
+    background-color: rgb(230, 230, 230);
+}
+
 .sidebar-item:hover {
     background-color: rgb(240, 240, 240);
+}
+
+.sidebar-item:active {
+    background-color: rgb(230, 230, 230);
 }
 
 .select-button {
     flex: 1;
     display: flex;
     align-items: center;
+    gap: 7px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
 
+.icon {
+    width: 18px;
+    height: auto;
+    opacity: 0.95;
+}
+
 .delete-button {
-    width: 32px;
+    width: 29px;
     height: auto;
     display: flex;
     justify-content: center;
@@ -95,6 +122,7 @@ button {
 }
 
 .delete-icon {
+    flex: 1;
     opacity: 0;
 }
 
@@ -118,7 +146,8 @@ button {
     width: 600px;
 }
 
-#selected-project-title {
+#selected-title {
+    font-size: 1.5rem;
     margin: 0;
 }
 
@@ -253,7 +282,7 @@ button {
     top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
+    width: 350px;
     padding-top: 2px;
     background-color: white;
     border: 1px solid lightgray;
@@ -443,9 +472,19 @@ label {
     width: 80px;
     height: 35px;
     border-radius: 16px;
-    background-color: rgb(189, 189, 189);
+    background-color: rgb(201, 201, 201);
+    transition: 0.05s linear;
 }
 
+#confirm-button:hover,
+#reject-button:hover {
+    background-color: rgb(221, 221, 221);
+}
+
+#confirm-button:active,
+#reject-button:active {
+    background-color: rgb(201, 201, 201);
+}
 
 .error-msg {
     font-size: 1.05rem;
