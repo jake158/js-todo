@@ -141,9 +141,17 @@ export class TodoManager {
 
     listTodosBefore(date) {
         if (!date instanceof Date) { throw new Error('Invalid date'); }
-        const todos = [];
+        let todos = [];
         for (const project of Object.keys(this.projects)) {
             todos = [...todos, ...this.projects[project].filter(e => e.dueDate < date)]
+        }
+        return todos.length === 0 ? null : todos;
+    }
+
+    listAllTodos() {
+        let todos = [];
+        for (const project of Object.keys(this.projects)) {
+            todos = [...todos, ...this.projects[project]]
         }
         return todos.length === 0 ? null : todos;
     }

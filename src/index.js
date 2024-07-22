@@ -1,6 +1,6 @@
 import 'modern-normalize'
 import './style.css'
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 
 import { Todo, TodoManager } from './todo.js'
 import { editTodoPopup, newTodoPopup } from './popUpsTodo.js'
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => new TodoView());
 
 class TodoView {
     constructor() {
+        this.catgOl = document.getElementById('category-list');
         this.projOl = document.getElementById('project-list');
         this.todoOl = document.getElementById('todo-list');
         this.selectedProjHeader = document.getElementById('selected-project-title');
@@ -28,16 +29,17 @@ class TodoView {
         this.todo = new TodoManager();
 
         // Debug
-        this.todo.addTodo(new Todo('Do thing', 'Description 2133333333333333333333333333333333333333333333333333333333333931823813', new Date(Date.now())), 'Default');
-        this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now()), 3), 'Default');
-        this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now())), 'Default');
-        this.todo.addTodo(new Todo('Do another thing', '', new Date(Date.now()), 300), 'Default');
+        this.todo.addTodo(new Todo('Do thing', 'Cool description', new Date()), 'Default');
+        this.todo.addTodo(new Todo('Do another thing', '', new Date(), 3), 'Default');
+        this.todo.addTodo(new Todo('Thing in 3 days', '', addDays(new Date(), 3)), 'Default');
+        this.todo.addTodo(new Todo('Thing in 8 days', '', addDays(new Date(), 8), 300), 'Default');
 
         this.todo.addProject('Test');
         this.todo.addProject('Test2');
         this.todo.addProject('Cool project');
         //
 
+        this.populateCategories();
         this.populateProjects();
         this.selectProject(this.todo.listProjects()[0]);
 
@@ -52,30 +54,109 @@ class TodoView {
         newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
     }
 
+    #constructEntry(todo, longDate = false) {
+        const container = document.createElement('div');
+        container.innerHTML = `
+            <div class="todo-entry${todo.complete ? ' complete' : ''}">
+                <button class="complete-button">
+                    <img class="complete-icon" src=${todo.complete ? completeIcon : incompleteIcon}>
+                </button>
+                <button class="todo-button">
+                    <p class="todo-title">${todo.title}</p>
+                </button>
+            </div>
+            <p class="todo-description">${todo.description}</p>
+            <div class="todo-info">
+                <div class="due-info">
+                    <img class="calendar-icon" src=${calendarIcon}>
+                    <p class="todo-due-date">${format(todo.dueDate, longDate ? 'MMMM do, yyyy' : 'MMMM do')}</p>
+                </div>
+                <p class="todo-project">${todo.project}</p>
+            </div>
+            `;
+
+        container.querySelector('.complete-button').addEventListener('click', () => {
+            todo.complete = !todo.complete;
+            this.refreshTodos();
+        });
+
+        container.querySelector('.todo-button').addEventListener('click', () => {
+            this.#openTodoDetails(todo.id, todo.project);
+        });
+
+        container.classList.add('todo-container');
+        return container;
+    };
+
+    populateCategories() {
+        this.catgOl.innerHTML = `
+            <li class="sidebar-item" data-name="Today">
+                <button class="select-button">Today</button>
+            </li>
+            <li class="sidebar-item" data-name="Week">
+                <button class="select-button">Week</button>
+            </li>
+            <li class="sidebar-item" data-name="Done">
+                <button class="select-button">Done</button>
+            </li>
+        `;
+
+        this.catgOl.querySelectorAll('.select-button').forEach(button => {
+            button.addEventListener('click', (event) => this.selectCategory(event.target.textContent));
+        });
+    }
+
+    selectCategory(title) {
+        if (this.selectedLi) {
+            this.selectedLi.classList.remove('selected');
+        }
+        const li = this.catgOl.querySelector(`[data-name="${title}"]`)
+        li.classList.add('selected');
+        this.selectedLi = li;
+
+        this.selectedProject = null;
+        this.selectedCategory = title;
+        this.selectedProjHeader.textContent = title;
+
+        this.#populateCategory(title);
+    }
+
+    #populateCategory(title) {
+        switch (title) {
+            case 'Today':
+                const tomorrow = addDays(new Date(), 1);
+                this.#populateTodos(this.todo.listTodosBefore(tomorrow).filter(todo => !todo.complete));
+                break;
+            case 'Week':
+                const nextWeek = addDays(new Date(), 7);
+                this.#populateTodos(this.todo.listTodosBefore(nextWeek).filter(todo => !todo.complete));
+                break;
+            case 'Done':
+                this.#populateTodos(this.todo.listAllTodos().filter(todo => todo.complete));
+                break;
+        }
+    }
+
     populateProjects() {
         this.projOl.innerHTML = '';
-        for (const projName of this.todo.listProjects()) {
-            const li = document.createElement('li');
-            li.dataset.name = projName;
-
-            const selectBtn = document.createElement('button');
-            selectBtn.classList.add('project-select-button');
-            selectBtn.textContent = projName;
-            selectBtn.addEventListener('click', () => this.selectProject(projName));
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.classList.add('project-delete-button');
-            deleteBtn.addEventListener('click', () => this.deleteProject(projName));
-
-            const deleteSymbol = document.createElement('img');
-            deleteSymbol.classList.add('delete-icon');
-            deleteSymbol.src = deleteIcon;
-            deleteBtn.appendChild(deleteSymbol);
-
-            li.appendChild(selectBtn);
-            li.appendChild(deleteBtn);
-            this.projOl.appendChild(li);
+        for (const title of this.todo.listProjects()) {
+            this.projOl.innerHTML += `
+            <li class="sidebar-item" data-name="${title}">
+                <button class="select-button">${title}</button>
+                <button class="delete-button">
+                    <img class="delete-icon" src="${deleteIcon}" />
+                </button>
+            </li>
+        `;
         }
+
+        this.projOl.querySelectorAll('.select-button').forEach(button => {
+            button.addEventListener('click', (event) => this.selectProject(event.target.textContent));
+        });
+
+        this.projOl.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', (event) => this.deleteProject(button.closest('li').dataset.name));
+        });
     }
 
     selectProject(title) {
@@ -86,9 +167,24 @@ class TodoView {
         li.classList.add('selected');
         this.selectedLi = li;
 
+        this.selectedCategory = null;
         this.selectedProject = title;
         this.selectedProjHeader.textContent = title;
-        this.#populateProjectTodos(title);
+
+        this.#populateProject(title);
+    }
+
+    #populateProject(title) {
+        this.#populateTodos(this.todo.listProjectTodos(title).filter(todo => !todo.complete));
+    }
+
+    refreshTodos() {
+        if (this.selectedProject) {
+            this.#populateProject(this.selectedProject);
+        }
+        else if (this.selectedCategory) {
+            this.#populateCategory(this.selectedCategory);
+        }
     }
 
     createProject(title) {
@@ -126,55 +222,25 @@ class TodoView {
         );
     }
 
-    #populateProjectTodos(title) {
+    #populateTodos(todoArray) {
+        const constructPriorityLi = (priority) => {
+            const li = document.createElement('li');
+            li.textContent = `Priority: ${priority}`;
+            li.classList.add('list-subheader');
+            return li;
+        }
+
         const currentYear = new Date().getFullYear();
-
-        const constructEntry = (todo) => {
-            const container = document.createElement('div');
-            container.innerHTML = `
-            <div class="todo-entry${todo.complete ? ' complete' : ''}">
-                <button class="complete-button">
-                    <img class="complete-icon" src=${todo.complete ? completeIcon : incompleteIcon}>
-                </button>
-                <button class="todo-button">
-                    <p class="todo-title">${todo.title}</p>
-                </button>
-            </div>
-            <p class="todo-description">${todo.description}</p>
-            <div class="todo-info">
-                <div class="due-info">
-                    <img class="calendar-icon" src=${calendarIcon}>
-                    <p class="todo-due-date">${format(todo.dueDate, todo.dueDate.getFullYear() === currentYear ? 'MMMM do' : 'MMMM do, yyyy')}</p>
-                </div>
-                <p class="todo-project">${todo.project}</p>
-            </div>
-            `;
-
-            container.querySelector('.complete-button').addEventListener('click', () => {
-                todo.complete = !todo.complete;
-                this.#populateProjectTodos(todo.project);
-            });
-
-            container.querySelector('.todo-button').addEventListener('click', () => {
-                this.#openTodoDetails(todo.id, todo.project);
-            });
-
-            container.classList.add('todo-container');
-            return container;
-        };
-
-        this.todoOl.innerHTML = '';
         let prevPriority = null;
-        for (const todo of this.todo.listProjectTodos(title)) {
+        this.todoOl.innerHTML = '';
+
+        for (const todo of todoArray) {
             if (todo.priority != prevPriority) {
-                const priorityLi = document.createElement('li');
-                priorityLi.textContent = `Priority: ${todo.priority}`;
-                priorityLi.classList.add('list-subheader');
                 prevPriority = todo.priority;
-                this.todoOl.appendChild(priorityLi);
+                this.todoOl.appendChild(constructPriorityLi(todo.priority));
             }
             const li = document.createElement('li');
-            li.appendChild(constructEntry(todo));
+            li.appendChild(this.#constructEntry(todo, todo.dueDate.getFullYear() !== currentYear));
             this.todoOl.appendChild(li);
         }
     }
@@ -196,17 +262,17 @@ class TodoView {
         for (const key of Object.keys(data)) {
             todo[key] = data[key];
         }
-        this.#populateProjectTodos(this.selectedProject);
+        this.refreshTodos();
     }
 
     #createTodo(data) {
         const todo = new Todo(data.title, data.description, data.dueDate, data.priority, data.notes);
         this.todo.addTodo(todo, data.project);
-        this.#populateProjectTodos(this.selectedProject);
+        this.refreshTodos();
     }
 
     #deleteTodo(id, project) {
         this.todo.removeTodo(id, project);
-        this.#populateProjectTodos(this.selectedProject);
+        this.refreshTodos();
     }
 }

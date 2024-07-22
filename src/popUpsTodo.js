@@ -87,7 +87,7 @@ export class editTodoPopup {
         callback({
             title: this.title.value || 'Unnamed todo',
             description: this.description.value,
-            dueDate: parse(this.dueDate.value, 'yyyy-MM-dd', new Date()) || new Date(Date.now()),
+            dueDate: parse(this.dueDate.value, 'yyyy-MM-dd', new Date()) || new Date(),
             priority: parseInt(this.priority.value) || 1,
             notes: this.notes.value,
             project: this.project.value,
@@ -104,7 +104,7 @@ export class newTodoPopup extends editTodoPopup {
 
     show(projects, currentProject, callback) {
         this.initializePopup("Add Todo", projects, currentProject, callback);
-        this.dueDate.value = format(new Date(Date.now()), 'yyyy-MM-dd');
+        this.dueDate.value = format(new Date(), 'yyyy-MM-dd');
 
         const buttonArea = this.p.querySelector('.todo-button-area');
         buttonArea.innerHTML = `
