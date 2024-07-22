@@ -1,9 +1,8 @@
-import 'modern-normalize'
-import './style.css'
+import 'modern-normalize';
+import './style.css';
 import { addDays, subDays, startOfDay, format } from 'date-fns';
-
-import { Todo, TodoManager } from './todo.js'
-import { editTodoPopup, newTodoPopup } from './popUpsTodo.js'
+import { Todo, TodoManager } from './todo.js';
+import { editTodoPopup, newTodoPopup } from './popUpsTodo.js';
 import { newProjectPopup, confirmPopup, errorPopup } from './popUpsOther.js';
 
 import todayIcon from './img/calendar-blank.svg';
@@ -11,28 +10,21 @@ import weekIcon from './img/calendar-blank-multiple.svg';
 import doneIcon from './img/trash-can.svg';
 import projectIcon from './img/project.svg';
 import projectDeleteIcon from './img/delete.svg';
-
 import incompleteIcon from './img/incomplete.svg';
 import completeIcon from './img/complete.svg';
-import calendarIcon from './img/calendar.svg'
-
+import calendarIcon from './img/calendar.svg';
 
 document.addEventListener('DOMContentLoaded', () => new TodoView());
 
 
 class TodoView {
     constructor() {
-        this.catgOl = document.getElementById('category-list');
-        this.projOl = document.getElementById('project-list');
-        this.todoOl = document.getElementById('todo-list');
-        this.selectedHeader = document.getElementById('selected-title');
-
-        const state = localStorage.getItem('todoState');
-        this.todo = new TodoManager(state);
-        if (!state) { this.populateState(); }
-
+        this.initializeElements();
+        this.initializeState();
         this.populateCategories();
         this.populateProjects();
+        this.initializePopups();
+        this.setupEventListeners();
 
         const memoryCategory = JSON.parse(localStorage.getItem('selectedCategory'));
         const memoryProject = JSON.parse(localStorage.getItem('selectedProject'));
@@ -44,23 +36,27 @@ class TodoView {
         } else {
             this.selectCategory('Today');
         }
-
-        const popUpDiv = document.getElementById('backdrop');
-        const newProjectBtn = document.getElementById('new-project-btn');
-        const newTodoBtn = document.getElementById('new-todo-btn');
-
-        this.editTodoPopup = new editTodoPopup(popUpDiv);
-        this.confirmPopup = new confirmPopup(popUpDiv);
-        this.errorPopup = new errorPopup(popUpDiv);
-
-        this.newProjectPopup = new newProjectPopup(popUpDiv);
-        newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.createProject(title)));
-
-        this.newTodoPopup = new newTodoPopup(popUpDiv);
-        newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
     }
 
-    populateState() {
+    initializeElements() {
+        this.catgOl = document.getElementById('category-list');
+        this.projOl = document.getElementById('project-list');
+        this.todoOl = document.getElementById('todo-list');
+        this.selectedHeader = document.getElementById('selected-title');
+        this.popUpDiv = document.getElementById('backdrop');
+        this.newProjectBtn = document.getElementById('new-project-btn');
+        this.newTodoBtn = document.getElementById('new-todo-btn');
+    }
+
+    initializeState() {
+        const state = localStorage.getItem('todoState');
+        this.todo = new TodoManager(state);
+        if (!state) {
+            this.#populateInitialState();
+        }
+    }
+
+    #populateInitialState() {
         this.todo.addTodo(new Todo('Pay Taxes', '', subDays(new Date(), 365), 2), 'Default');
         this.todo.addTodo(new Todo('Renew Driver\'s License', '', subDays(new Date(), 21), 2), 'Default');
         this.todo.addTodo(new Todo('Book Flight Tickets', 'Oh god', new Date()), 'Default');
@@ -71,6 +67,7 @@ class TodoView {
         this.todo.addTodo(new Todo('Finish The Odin Project', '', addDays(new Date(), 90), 1), 'Coding');
         this.todo.addTodo(new Todo('Learn C#', '', addDays(new Date(), 180), 2), 'Coding');
         this.todo.addTodo(new Todo('Get a job', '', addDays(new Date(), 240), 2), 'Coding');
+
         this.saveState();
     }
 
@@ -80,48 +77,18 @@ class TodoView {
         localStorage.setItem('selectedCategory', JSON.stringify(this.selectedCategory || null));
     }
 
-    #constructEntry(todo, currentDate, renderOverdue = true, renderProject = true) {
-        const renderYear = todo.dueDate.getFullYear() !== currentDate.getFullYear();
-        const overdue = startOfDay(currentDate) > startOfDay(todo.dueDate);
+    initializePopups() {
+        this.editTodoPopup = new editTodoPopup(this.popUpDiv);
+        this.confirmPopup = new confirmPopup(this.popUpDiv);
+        this.errorPopup = new errorPopup(this.popUpDiv);
+        this.newProjectPopup = new newProjectPopup(this.popUpDiv);
+        this.newTodoPopup = new newTodoPopup(this.popUpDiv);
+    }
 
-        const getDueString = (dueDate) => {
-            const date = format(dueDate, renderYear ? 'MMMM do, yyyy' : 'MMMM do');
-            return date + (overdue && renderOverdue ? ' - Overdue' : '');
-        }
-
-        const container = document.createElement('div');
-        container.innerHTML = `
-            <div class="todo-entry${todo.complete ? ' complete' : ''}">
-                <button class="complete-button">
-                    <img class="complete-icon" src=${todo.complete ? completeIcon : incompleteIcon}>
-                </button>
-                <button class="todo-button">
-                    <p class="todo-title">${todo.title}</p>
-                </button>
-            </div>
-            <p class="todo-description">${todo.description}</p>
-            <div class="todo-info">
-                <div class="due-info">
-                    <img class="calendar-icon" src=${calendarIcon}>
-                    <p class="todo-due-date${overdue && renderOverdue ? ' overdue' : ''}">${getDueString(todo.dueDate)}</p>
-                </div>
-                <p class="todo-project">${renderProject ? todo.project : ''}</p>
-            </div>
-            `;
-
-        container.querySelector('.complete-button').addEventListener('click', () => {
-            todo.complete = !todo.complete;
-            this.saveState();
-            this.refreshTodos();
-        });
-
-        container.querySelector('.todo-button').addEventListener('click', () => {
-            this.#openTodoDetails(todo.id, todo.project);
-        });
-
-        container.classList.add('todo-container');
-        return container;
-    };
+    setupEventListeners() {
+        this.newProjectBtn.addEventListener('click', () => this.newProjectPopup.show((title) => this.createProject(title)));
+        this.newTodoBtn.addEventListener('click', () => this.newTodoPopup.show(this.todo.listProjects(), this.selectedProject, (data) => this.#createTodo(data)));
+    }
 
     populateCategories() {
         this.catgOl.innerHTML = `
@@ -154,7 +121,7 @@ class TodoView {
         if (this.selectedLi) {
             this.selectedLi.classList.remove('selected');
         }
-        const li = this.catgOl.querySelector(`[data-name="${title}"]`)
+        const li = this.catgOl.querySelector(`[data-name="${title}"]`);
         li.classList.add('selected');
         this.selectedLi = li;
 
@@ -167,17 +134,19 @@ class TodoView {
     }
 
     #populateCategory(title) {
+        let todos;
         switch (title) {
             case 'Today':
-                const tomorrow = addDays(new Date(), 1);
-                this.#populateTodos(this.todo.listTodosBefore(tomorrow).filter(todo => !todo.complete));
+                todos = this.todo.listTodosBefore(addDays(new Date(), 1)).filter(todo => !todo.complete);
+                this.populateTodos(todos);
                 break;
             case 'Week':
-                const nextWeek = addDays(new Date(), 7);
-                this.#populateTodos(this.todo.listTodosBefore(nextWeek).filter(todo => !todo.complete));
+                todos = this.todo.listTodosBefore(addDays(new Date(), 7)).filter(todo => !todo.complete);
+                this.populateTodos(todos);
                 break;
             case 'Done':
-                this.#populateTodos(this.todo.listAllTodos().filter(todo => todo.complete), false, false);
+                todos = this.todo.listAllTodos().filter(todo => todo.complete);
+                this.populateTodos(todos, false, false, true);
                 break;
         }
     }
@@ -186,16 +155,16 @@ class TodoView {
         this.projOl.innerHTML = '';
         for (const title of this.todo.listProjects()) {
             this.projOl.innerHTML += `
-            <li class="sidebar-item" data-name="${title}">
-                <button class="select-button" data-target="${title}">
-                    <img class="icon" src="${projectIcon}" />
-                    <p>${title}</p>
-                </button>
-                <button class="delete-button">
-                    <img class="icon delete-icon" src="${projectDeleteIcon}" />
-                </button>
-            </li>
-        `;
+                <li class="sidebar-item" data-name="${title}">
+                    <button class="select-button" data-target="${title}">
+                        <img class="icon" src="${projectIcon}" />
+                        <p>${title}</p>
+                    </button>
+                    <button class="delete-button">
+                        <img class="icon delete-icon" src="${projectDeleteIcon}" />
+                    </button>
+                </li>
+            `;
         }
 
         this.projOl.querySelectorAll('.select-button').forEach(button => {
@@ -211,7 +180,7 @@ class TodoView {
         if (this.selectedLi) {
             this.selectedLi.classList.remove('selected');
         }
-        const li = this.projOl.querySelector(`[data-name="${title}"]`)
+        const li = this.projOl.querySelector(`[data-name="${title}"]`);
         li.classList.add('selected');
         this.selectedLi = li;
 
@@ -224,14 +193,14 @@ class TodoView {
     }
 
     #populateProject(title) {
-        this.#populateTodos(this.todo.listProjectTodos(title).filter(todo => !todo.complete), true, true, false);
+        const todos = this.todo.listProjectTodos(title).filter(todo => !todo.complete);
+        this.populateTodos(todos, true, true, false);
     }
 
     refreshTodos() {
         if (this.selectedProject) {
             this.#populateProject(this.selectedProject);
-        }
-        else if (this.selectedCategory) {
+        } else if (this.selectedCategory) {
             this.#populateCategory(this.selectedCategory);
         }
     }
@@ -248,8 +217,7 @@ class TodoView {
             if (this.selectedProject) {
                 this.selectProject(this.selectedProject);
             }
-        }
-        catch (error) {
+        } catch (error) {
             this.errorPopup.show(error.message);
         }
     }
@@ -260,32 +228,37 @@ class TodoView {
             this.errorPopup.show('There has to be at least one project');
             return;
         }
-        this.confirmPopup.show(`Remove project ${title}?`,
-            () => {
-                this.todo.removeProject(title);
-                this.saveState();
-                const li = this.projOl.querySelector(`[data-name="${title}"]`);
-                this.projOl.removeChild(li);
+        this.confirmPopup.show(`Remove project ${title}?`, () => {
+            this.todo.removeProject(title);
+            this.saveState();
+            const li = this.projOl.querySelector(`[data-name="${title}"]`);
+            this.projOl.removeChild(li);
 
-                if (this.selectedProject === title) {
-                    projects.splice(projects.indexOf(title), 1);
-                    this.selectProject(projects.pop());
-                }
+            if (this.selectedProject === title) {
+                projects.splice(projects.indexOf(title), 1);
+                this.selectProject(projects.pop());
             }
-        );
+        });
     }
 
-    #populateTodos(todoArray, renderPriority = true, renderOverdue = true, renderProject = true) {
+    #createTodo(data) {
+        const todo = new Todo(data.title, data.description, data.dueDate, data.priority, data.notes);
+        this.todo.addTodo(todo, data.project);
+        this.saveState();
+        this.refreshTodos();
+    }
+
+    populateTodos(todoArray, renderPriority = true, renderOverdue = true, renderProject = true) {
+        const currentDate = new Date();
+        let prevPriority = null;
+        this.todoOl.innerHTML = '';
+
         const constructPriorityLi = (priority) => {
             const li = document.createElement('li');
             li.textContent = `Priority: ${priority}`;
             li.classList.add('list-subheader');
             return li;
         }
-
-        const currentDate = new Date();
-        let prevPriority = null;
-        this.todoOl.innerHTML = '';
 
         for (const todo of todoArray) {
             if (renderPriority && (todo.priority != prevPriority)) {
@@ -298,9 +271,52 @@ class TodoView {
         }
     }
 
-    #openTodoDetails(id, project) {
+    #constructEntry(todo, currentDate, renderOverdue = true, renderProject = true) {
+        const renderYear = todo.dueDate.getFullYear() !== currentDate.getFullYear();
+        const overdue = startOfDay(currentDate) > startOfDay(todo.dueDate);
+
+        const getDueString = (dueDate) => {
+            const date = format(dueDate, renderYear ? 'MMMM do, yyyy' : 'MMMM do');
+            return date + (overdue && renderOverdue ? ' - Overdue' : '');
+        }
+
+        const container = document.createElement('div');
+        container.innerHTML = `
+            <div class="todo-entry${todo.complete ? ' complete' : ''}">
+                <button class="complete-button">
+                    <img class="complete-icon" src=${todo.complete ? completeIcon : incompleteIcon}>
+                </button>
+                <button class="todo-button">
+                    <p class="todo-title">${todo.title}</p>
+                </button>
+            </div>
+            <p class="todo-description">${todo.description}</p>
+            <div class="todo-info">
+                <div class="due-info">
+                    <img class="calendar-icon" src=${calendarIcon}>
+                    <p class="todo-due-date${overdue && renderOverdue ? ' overdue' : ''}">${getDueString(todo.dueDate)}</p>
+                </div>
+                <p class="todo-project">${renderProject ? todo.project : ''}</p>
+            </div>
+        `;
+
+        container.querySelector('.complete-button').addEventListener('click', () => {
+            todo.complete = !todo.complete;
+            this.saveState();
+            this.refreshTodos();
+        });
+
+        container.querySelector('.todo-button').addEventListener('click', () => {
+            this.openTodoDetails(todo.id, todo.project);
+        });
+
+        container.classList.add('todo-container');
+        return container;
+    }
+
+    openTodoDetails(id, project) {
         const todo = this.todo.getTodo(id, project);
-        this.editTodoPopup.show(todo, this.todo.listProjects(), (data) => this.#todoDataUpdated(data), () => this.#deleteTodo(id, project));
+        this.editTodoPopup.show(todo, this.todo.listProjects(), (data) => this.#todoDataUpdated(data), () => this.deleteTodo(id, project));
     }
 
     #todoDataUpdated(data) {
@@ -319,14 +335,7 @@ class TodoView {
         this.refreshTodos();
     }
 
-    #createTodo(data) {
-        const todo = new Todo(data.title, data.description, data.dueDate, data.priority, data.notes);
-        this.todo.addTodo(todo, data.project);
-        this.saveState();
-        this.refreshTodos();
-    }
-
-    #deleteTodo(id, project) {
+    deleteTodo(id, project) {
         this.todo.removeTodo(id, project);
         this.saveState();
         this.refreshTodos();

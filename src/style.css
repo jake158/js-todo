@@ -4,7 +4,7 @@
 }
 
 body {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
 }
 
@@ -25,6 +25,9 @@ button {
 }
 
 .header h2 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     font-size: 1.1rem;
 }
 
@@ -102,6 +105,10 @@ button {
     display: flex;
     align-items: center;
     gap: 7px;
+    max-width: calc(100% - 30px);
+}
+
+.select-button p {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -116,6 +123,7 @@ button {
 .delete-button {
     width: 29px;
     height: auto;
+    margin-right: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -200,6 +208,7 @@ button {
 .complete-button {
     width: 30px;
     height: 30px;
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -287,6 +296,7 @@ button {
     background-color: white;
     border: 1px solid lightgray;
     border-radius: 8px;
+    overflow: hidden;
     z-index: 1000;
 }
 
@@ -311,6 +321,10 @@ button {
     margin: 0;
     font-size: 1rem;
     font-weight: normal;
+    text-overflow: ellipsis;
+    max-width: calc(80%);
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 
@@ -448,6 +462,7 @@ label {
     background-color: var(--accent);
     border-radius: 16px;
     align-self: center;
+    flex-shrink: 0;
 }
 
 #add-button:hover {
